@@ -2,64 +2,59 @@
 <html lang="en">
 
 <head>
-  <!-- IE is garbage -->
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- IE is garbage -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/datatables.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/datatables.min.css">
 
-  <title>Tupper Lake 8 Miler!</title>
+    <title>Tupper Lake 8 Miler!</title>
 </head>
 
 <body>
-  <h1 id="inner-title">Tupper Lake 8 Miler</h1>
-  <div class="container-fluid">
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link active" id="entry-tab" data-toggle="tab" href="#entry_form" role="tab"
-          aria-controls="entry_form" aria-selected="true">Entry Form</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="entries-tab" data-toggle="tab" href="#entries" role="tab" aria-controls="entries"
-          aria-selected="false">All Entries</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="addresult-tab" data-toggle="tab" href="#add_result" role="tab" aria-controls="add_result"
-          aria-selected="false">Add Result</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="results-tab" data-toggle="tab" href="#all_results" role="tab"
-          aria-controls="all_results" aria-selected="false">All Results</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="admin-tab" data-toggle="tab" href="#admin" role="tab"
-          aria-controls="admin" aria-selected="false">Admin</a>
-      </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade show active" id="entry_form" role="tabpanel" aria-labelledby="entry-tab">
-        <form id="registration_form">
-          <input type="hidden" id="_rev" name="_rev" value="">
-          <input type="hidden" id="_id"  name="_id" value="">
-          <div class="row">
-            <div class="col-sm-6">Boat Captain</div>
-            <div class="col-ms-6">Crew</div>
-          </div>
-          <div class="form-group row">
-            <label for="p1name" class="col-sm-2 col-form-label">Name</label>
-            <div class="col-sm-4">
-              <input type="text" class="form-control" id="p1name" name="p1name" placeholder="Captain Name">
-            </div>
-            <label for="p2name" class="col-sm-2 col-form-label">Name</label>
-            <div class="col-sm-4">
-              <input type="text" class="form-control" id="p2name" name="p2name" placeholder="Crew Name(s)">
-            </div>
-          </div>
-          <!-- <div class="form-group row">
+    <h1 id="inner-title">Tupper Lake 8 Miler</h1>
+    <div class="container-fluid">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="entry-tab" data-toggle="tab" href="#entry_form" role="tab" aria-controls="entry_form" aria-selected="true">Entry Form</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="entries-tab" data-toggle="tab" href="#entries" role="tab" aria-controls="entries" aria-selected="false">All Entries</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="addresult-tab" data-toggle="tab" href="#add_result" role="tab" aria-controls="add_result" aria-selected="false">Add Result</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="results-tab" data-toggle="tab" href="#all_results" role="tab" aria-controls="all_results" aria-selected="false">All Results</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="admin-tab" data-toggle="tab" href="#admin" role="tab" aria-controls="admin" aria-selected="false">Admin</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="entry_form" role="tabpanel" aria-labelledby="entry-tab">
+                <form class="needs-validation" id="registration_form" novalidate>
+                    <input type="hidden" id="_rev" name="_rev" value="">
+                    <input type="hidden" id="_id" name="_id" value="">
+                    <div class="row">
+                        <div class="col-sm-6">Boat Captain</div>
+                        <div class="col-ms-6">Crew</div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="p1name" class="col-sm-2 col-form-label">Name</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="p1name" name="p1name" placeholder="Captain Name" required>
+                        </div>
+                        <label for="p2name" class="col-sm-2 col-form-label">Name</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="p2name" name="p2name" placeholder="Crew Name(s)">
+                        </div>
+                    </div>
+                    <!-- <div class="form-group row">
             <label for="p1addr1" class="col-sm-2 col-form-label">Address</label>
             <div class="col-sm-4">
               <input type="text" class="form-control" id="p1addr1" name="p1addr1" placeholder="Paddler 1 Address Line 1">
@@ -69,17 +64,17 @@
               <input type="text" class="form-control" id="p2addr1" name="p2addr1" placeholder="Paddler 2 Address Line 1">
             </div>
           </div> -->
-          <div class="form-group row">
-            <label for="p1addr2" class="col-sm-2 col-form-label">City/State</label>
-            <div class="col-sm-4">
-              <input type="text" class="form-control" id="p1addr2" name="p1addr2" placeholder="Captain City/State">
-            </div>
-            <label for="p2addr2" class="col-sm-2 col-form-label">City/State</label>
-            <div class="col-sm-4">
-              <input type="text" class="form-control" id="p2addr2" name="p2addr2" placeholder="Crew City/State">
-            </div>
-          </div>
-          <!-- <div class="form-group row">
+                    <div class="form-group row">
+                        <label for="p1addr2" class="col-sm-2 col-form-label">City/State</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="p1addr2" name="p1addr2" placeholder="Captain City/State" required>
+                        </div>
+                        <label for="p2addr2" class="col-sm-2 col-form-label">City/State</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="p2addr2" name="p2addr2" placeholder="Crew City/State">
+                        </div>
+                    </div>
+                    <!-- <div class="form-group row">
             <label for="p1phone" class="col-sm-2 col-form-label">Home Phone</label>
             <div class="col-sm-2">
               <input type="text" class="form-control" id="p1phone" name="p1phone" placeholder="Paddler 1 Phone">
@@ -107,40 +102,42 @@
               <input type="text" class="form-control" id="p2email" name="p2email" placeholder="Paddler 2 Email">
             </div>
           </div> -->
-          <fieldset class="form-group">
-            <div class="row">
-              <legend class="col-form-label col-sm-2 pt-0">Age Category</legend>
-              <div class="col-sm-10" id="age-category">
-              </div>
-            </div>
-          </fieldset>
-          <fieldset class="form-group">
-            <div class="row">
-              <legend class="col-form-label col-sm-2 pt-0">Gender Category</legend>
-              <div class="col-sm-10">
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="genderCategory" id="genderCategory1" value="Male">
-                  <label class="form-check-label" for="genderCategory1">
+                    <fieldset class="form-group">
+                        <div class="row">
+                            <legend class="col-form-label col-sm-2 pt-0">Age Category</legend>
+                            <div class="col-sm-10 form-check" id="age-category">
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="form-group">
+                        <div class="row">
+                            <legend class="col-form-label col-sm-2 pt-0">Gender Category</legend>
+                            <div class="col-sm-10">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="genderCategory" id="genderCategory1" value="Male" required />
+                                    <label class="form-check-label" for="genderCategory1">
                     Male
                   </label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="genderCategory" id="genderCategory2"
-                    value="Female">
-                  <label class="form-check-label" for="genderCategory2">
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="genderCategory" id="genderCategory2" value="Female" required />
+                                    <label class="form-check-label" for="genderCategory2">
                     Female
                   </label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="genderCategory" id="genderCategory3" value="Mixed">
-                  <label class="form-check-label" for="genderCategory3">
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="genderCategory" id="genderCategory3" value="Mixed" required />
+                                    <label class="form-check-label" for="genderCategory3">
                     Mixed
                   </label>
-                </div>
-              </div>
-            </div>
-          </fieldset>
-          <!-- <fieldset class="form-group">
+                                    <div class="invalid-feedback">
+                                        <div class="form-check">Please enter an gender category</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <!-- <fieldset class="form-group">
             <div class="row">
               <legend class="col-form-label col-sm-2 pt-0">AWA Member</legend>
               <div class="col-sm-10">
@@ -178,101 +175,105 @@
               </div>
             </div>
           </fieldset> -->
-          <div class="form-group row">
-            <label for="boatnumber" class="col-sm-2 col-form-label">Boat Number</label>
-            <div class="col-sm-10">
-              <input type="text" class="form-control" id="boatnumber" name="boatnumber" placeholder="Boat Number">
+                    <div class="form-group row">
+                        <label for="boatnumber" class="col-sm-2 col-form-label">Boat Number</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="boatnumber" name="boatnumber" placeholder="Boat Number" required />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="offset-sm-1 col-sm-11">
+                            <h3>Boat Classes</h3>
+                        </div>
+                    </div>
+                    <fieldset class="form-group" id="boat-classes">
+                    </fieldset>
+                    <div class="form-group row">
+                        <div class="col-sm-10">
+                            <button type="submit" class="btn btn-primary">Save Entry</button>
+                            <button id="deleteEntry" type="button" class="btn btn-danger">Delete Entry</button>
+                            <button id="clearEntry" type="button" class="btn btn-warning">Clear Entry</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-          </div>
-          <div class="form-group row">
-            <div class="offset-sm-1 col-sm-11">
-              <h3>Boat Classes</h3>
+            <div class="tab-pane fade" id="entries" role="tabpanel" aria-labelledby="entries-tab">
+                <table class="table table-striped table-bordered" id="entries-table" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Age Category</th>
+                            <th>Gender Category</th>
+                            <th>Boat #</th>
+                            <th>Name 1</th>
+                            <th>Addr 1</th>
+                            <th>Name 2</th>
+                            <th>Addr 2</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
-          </div>
-          <fieldset class="form-group" id="boat-classes">
-          </fieldset>
-          <div class="form-group row">
-            <div class="col-sm-10">
-              <button type="submit" class="btn btn-primary">Save Entry</button>
-              <button id="deleteEntry" type="button" class="btn btn-danger">Delete Entry</button>
-              <button id="clearEntry" type="button" class="btn btn-warning">Clear Entry</button>
+            <div class="tab-pane fade" id="add_result" role="tabpanel" aria-labelledby="addresult-tab">
+                <div class="form-group row">
+                    <label for="add_result_boat_number" class="col-sm-2 col-form-label">Boat Number</label>
+                    <div class="col-sm-2"><input class="form-control" type="text" id="add_result_boat_number" name="add_result_boat_number" placeholder="Boat#" /></div>
+                    <label for="add_result_result" class="col-sm-2 col-form-label">Result</label>
+                    <div class="col-sm-2"><input class="form-control" type="text" id="add_result_result" name="add_result_result" placeholder="Time" /></div>
+                    <div class="col-sm-2"><button class="btn btn-primary" id="add_result_submit" name="add_result_submit">Save
+              Result</button></div>
+                </div>
+                <div class="form-group row">
+                    <input type="hidden" id="add_result_id" name="add_result_id" />
+                    <label for="add_result_class" class="col-sm-1 col-form-label">Class</label>
+                    <div class="col-sm-2"><input type="text" readonly class="form-control-plaintext" id="add_result_class" />
+                    </div>
+                    <label for="add_result_person1" class="col-sm-1 col-form-label">Person 1</label>
+                    <div class="col-sm-2"><input type="text" readonly class="form-control-plaintext" id="add_result_person1" />
+                    </div>
+                    <label for="add_result_person2" class="col-sm-1 col-form-label">Person 2</label>
+                    <div class="col-sm-2"><input type="text" readonly class="form-control-plaintext" id="add_result_person2" />
+                    </div>
+                </div>
             </div>
-          </div>
-        </form>
-      </div>
-      <div class="tab-pane fade" id="entries" role="tabpanel" aria-labelledby="entries-tab">
-        <table class="table table-striped table-bordered" id="entries-table" width="100%">
-          <thead>
-            <tr>
-              <th>Class</th>
-              <th>Age Category</th>
-              <th>Gender Category</th>
-              <th>Boat #</th>
-              <th>Name 1</th>
-              <th>Addr 1</th>
-              <th>Name 2</th>
-              <th>Addr 2</th>
-            </tr>
-        </thead>
-        </table>
-      </div>
-      <div class="tab-pane fade" id="add_result" role="tabpanel" aria-labelledby="addresult-tab">
-        <div class="form-group row">
-          <label for="add_result_boat_number" class="col-sm-2 col-form-label">Boat Number</label>
-          <div class="col-sm-2"><input class="form-control" type="text" id="add_result_boat_number" name="add_result_boat_number" placeholder="Boat#"/></div>
-          <label for="add_result_result" class="col-sm-2 col-form-label">Result</label>
-          <div class="col-sm-2"><input class="form-control" type="text" id="add_result_result" name="add_result_result" placeholder="Time"/></div>
-          <div class="col-sm-2"><button class="btn btn-primary" id="add_result_submit" name="add_result_submit">Save Result</button></div>
+            <div class="tab-pane fade" id="all_results" role="tabpanel" aria-labelledby="results-tab">
+                <table class="table table-striped table-bordered" id="results-table" width="100%">
+                    <thead>
+                        <tr>
+                            <th>category</th>
+                            <th>Result</th>
+                            <th>Boat Number</th>
+                            <th>Name 1</th>
+                            <th>Addr 1</th>
+                            <th>Name 2</th>
+                            <th>Addr 2</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="tab-pane fade" id="admin" role="tabpanel" aria-labelledby="admin-tab">
+                <p>Missing</p>
+                <ul>
+                    <li>Error detection</li>
+                    <li>Form validation</li>
+                    <li>Connection to back-end server (while still allowing it to work off-line)</li>
+                    <li>Configurable race name</li>
+                    <li>Configurable boat classes</li>
+                    <li>Configurable age classes</li>
+                    <li>Printing</li>
+                    <li>what am I missing?</li>
+                </ul>
+            </div>
         </div>
-        <div class="form-group row">
-          <input type="hidden" id="add_result_id" name="add_result_id"/>
-          <label for="add_result_class" class="col-sm-1 col-form-label">Class</label>
-          <div class="col-sm-2"><input type="text" readonly class="form-control-plaintext" id="add_result_class"/></div>
-          <label for="add_result_person1" class="col-sm-1 col-form-label">Person 1</label>
-          <div class="col-sm-2"><input type="text" readonly class="form-control-plaintext" id="add_result_person1"/></div>
-          <label for="add_result_person2" class="col-sm-1 col-form-label">Person 2</label>
-          <div class="col-sm-2"><input type="text" readonly class="form-control-plaintext" id="add_result_person2"/></div>
-        </div>
-      </div>
-      <div class="tab-pane fade" id="all_results" role="tabpanel" aria-labelledby="results-tab">
-        <table class="table table-striped table-bordered" id="results-table" width="100%">
-          <thead>
-            <tr>
-              <th>category</th>
-              <th>Result</th>
-              <th>Boat Number</th>
-              <th>Name 1</th>
-              <th>Addr 1</th>
-              <th>Name 2</th>
-              <th>Addr 2</th>
-            </tr>
-          </thead>
-        </table>
-      </div>
-      <div class="tab-pane fade" id="admin" role="tabpanel" aria-labelledby="admin-tab">
-        <p>Missing</p>
-        <ul>
-          <li>Error detection</li>
-          <li>Form validation</li>
-          <li>Connection to back-end server (while still allowing it to work off-line)</li>
-          <li>Configurable race name</li>
-          <li>Configurable boat classes</li>
-          <li>Configurable age classes</li>
-          <li>Printing</li>
-          <li>what am I missing?</li>
-        </ul>
-      </div>
     </div>
-  </div>
 
-  <script src="js/jquery-3.4.1.slim.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/fetch.umd.js"></script>
-  <script src="js/es6-promise.auto.js"></script>
-  <script src="js/pouchdb-7.1.1.min.js"></script>
-  <script src="js/pouchdb.find.min.js"></script>
-  <script src="js/datatables.min.js"></script>
-  <script src="js/app.js"></script>
+    <script src="js/jquery-3.4.1.slim.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/fetch.umd.js"></script>
+    <script src="js/es6-promise.auto.js"></script>
+    <script src="js/pouchdb-7.1.1.min.js"></script>
+    <script src="js/pouchdb.find.min.js"></script>
+    <script src="js/datatables.min.js"></script>
+    <script src="js/app.js"></script>
 </body>
 
 </html>

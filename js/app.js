@@ -5,20 +5,20 @@ var boat_classes = {
     "Guideboat": ["1 Person Guideboat", "2 Person Guideboat", "Open Touring Guideboat"],
     "Kayak": ["K-1 Recreational", "K-1 Touring", "K-1 Unlimited", "2 Person Kayak"],
     "Canoe": ["Solo Recreational", "C-1 Stock", "C-2 Stock", "C-2 Amateur", "C-4 Stock", "Voyageur"],
-    "SUP": ["12'6\" Class", "14' Class"]
+    "SUP": ["12'6\" SUP", "14' SUP"]
 };
 
 
 //
-ResultsObj = function (databasename, remoteorigin) {
+ResultsObj = function(databasename, remoteorigin) {
     'use strict';
 
-    Object.defineProperty(this, 'pdb', {writable: true});
-    Object.defineProperty(this, 'remote', {writable: true});
+    Object.defineProperty(this, 'pdb', { writable: true });
+    Object.defineProperty(this, 'remote', { writable: true });
     // Object.defineProperty(this, 'entryformobj', {writable: true});
     // Object.defineProperty(this, 'notetable', {writable: true});
- 	// Object.defineProperty(this, 'searchentryformobj', {writable: true});
- 	// Object.defineProperty(this, 'errordialog', {writable: true});
+    // Object.defineProperty(this, 'searchentryformobj', {writable: true});
+    // Object.defineProperty(this, 'errordialog', {writable: true});
 
     var that = this;
 
@@ -32,8 +32,8 @@ ResultsObj = function (databasename, remoteorigin) {
     }).catch(function(err) {
         that.reporter('err = ' + err);
     });
-    this.pdb.on('error', function (err) { debugger; });
-    this.remote = remoteorigin + '/'+databasename;
+    this.pdb.on('error', function(err) { debugger; });
+    this.remote = remoteorigin + '/' + databasename;
 };
 
 /*
@@ -41,7 +41,7 @@ Create a function to log errors to the console for
 development.
 */
 
-ResultsObj.prototype.reporter = function (error, response) {
+ResultsObj.prototype.reporter = function(error, response) {
     'use strict';
     if (console !== undefined) {
         if (error) { console.log(error); }
@@ -51,7 +51,8 @@ ResultsObj.prototype.reporter = function (error, response) {
 
 ResultsObj.prototype.saveRegistration = function() {
     'use strict';
-    var o = {}, that = this;
+    var o = {},
+        that = this;
 
     /* Create an id if not found */
     if (!this.entryformobj._id.value) {
@@ -105,10 +106,10 @@ ResultsObj.prototype.deleteEntry = function() {
             $('#entries-tab').tab('show');
         }
     }).catch(function(error) {
-      that.reporter(error);
-      if (error) {
-          // Do something
-      }
+        that.reporter(error);
+        if (error) {
+            // Do something
+        }
     });
 }
 
@@ -117,20 +118,20 @@ ResultsObj.prototype.editEntry = function(rowData) {
     this.entryformobj._rev.value = rowData._rev;
     this.entryformobj.p1name.value = rowData.p1name
     this.entryformobj.p2name.value = rowData.p2name
-    // this.entryformobj.p1addr1.value = rowData.p1addr1
+        // this.entryformobj.p1addr1.value = rowData.p1addr1
     this.entryformobj.p1addr2.value = rowData.p1addr2
-    // this.entryformobj.p2addr1.value = rowData.p2addr1
+        // this.entryformobj.p2addr1.value = rowData.p2addr1
     this.entryformobj.p2addr2.value = rowData.p2addr2
-    // this.entryformobj.p1phone.value = rowData.p1phone
-    // this.entryformobj.p2phone.value = rowData.p2phone
-    // this.entryformobj.p1age.value = rowData.p1age
-    // this.entryformobj.p2age.value = rowData.p2age
-    // this.entryformobj.p1email.value = rowData.p1email
-    // this.entryformobj.p2email.value = rowData.p2email
+        // this.entryformobj.p1phone.value = rowData.p1phone
+        // this.entryformobj.p2phone.value = rowData.p2phone
+        // this.entryformobj.p1age.value = rowData.p1age
+        // this.entryformobj.p2age.value = rowData.p2age
+        // this.entryformobj.p1email.value = rowData.p1email
+        // this.entryformobj.p2email.value = rowData.p2email
     this.entryformobj.ageCategory.value = rowData.ageCategory
     this.entryformobj.genderCategory.value = rowData.genderCategory
-    // this.entryformobj.awaMember.value = rowData.awaMember
-    // this.entryformobj.nymcraMember.value = rowData.nymcraMember
+        // this.entryformobj.awaMember.value = rowData.awaMember
+        // this.entryformobj.nymcraMember.value = rowData.nymcraMember
     this.entryformobj.boatnumber.value = rowData.boatnumber
     this.entryformobj.boatClass.value = rowData.boatClass
     $('#entry-tab').tab('show');
@@ -146,7 +147,7 @@ ResultsObj.prototype.showEntry = function() {
     var that = this;
     var boatNumber = $('#add_result_boat_number').val();
     that.pdb.find({
-        selector: {boatnumber: boatNumber},
+        selector: { boatnumber: boatNumber },
         fields: ['_id', 'p1name', 'p2name', 'boatClass', 'result']
     }).then(function(response) {
         that.reporter(response);
@@ -186,7 +187,7 @@ ResultsObj.prototype.editResult = function(rowData) {
 
 ResultsObj.prototype.saveResult = function() {
     that = this;
-    that.pdb.get($('#add_result_id').val()).then(function (doc){
+    that.pdb.get($('#add_result_id').val()).then(function(doc) {
         doc.result = $('#add_result_result').val();
         return that.pdb.put(doc);
     }).then(function(response) {
@@ -203,22 +204,26 @@ ResultsObj.prototype.saveResult = function() {
 ResultsObj.prototype.showEntries = function() {
     'use strict';
     var that = this;
-    this.pdb.allDocs({'include_docs': true}).then(function(response) {
+    this.pdb.allDocs({ 'include_docs': true }).then(function(response) {
         that.reporter(response);
         var data = response.rows.filter(function(val) {
             return Boolean(val.doc.category);
         }).map(function(val) {
             return val.doc;
         });
-        var entryTable = $('#entries-table').DataTable( {
+        var entryTable = $('#entries-table').DataTable({
             destroy: true,
             select: true,
             rowGroup: {
                 dataSrc: 'category'
             },
-            orderFixed: [[0, 'asc'], [1, 'asc'], [2, 'asc']],
+            orderFixed: [
+                [0, 'asc'],
+                [1, 'asc'],
+                [2, 'asc']
+            ],
             data: data,
-            columnDefs: [{visible: false, targets: [0, 1, 2]}],
+            columnDefs: [{ visible: false, targets: [0, 1, 2] }],
             columns: [
                 { data: "boatClass" },
                 { data: "ageCategory" },
@@ -229,9 +234,9 @@ ResultsObj.prototype.showEntries = function() {
                 { data: "p2name" },
                 { data: "p2addr2" }
             ]
-        } );
+        });
         entryTable.on('select', function(e, dt, type, indexes) {
-            var rowData = dt.rows( indexes ).data().toArray()[0];
+            var rowData = dt.rows(indexes).data().toArray()[0];
             that.editEntry(rowData);
         })
     }).catch(function(error) {
@@ -243,7 +248,7 @@ ResultsObj.prototype.showEntries = function() {
 ResultsObj.prototype.showResults = function() {
     'use strict';
     var that = this;
-    this.pdb.allDocs({'include_docs': true}).then(function(response) {
+    this.pdb.allDocs({ 'include_docs': true }).then(function(response) {
         that.reporter(response);
         var data = response.rows.filter(function(val) {
             return Boolean(val.doc.category);
@@ -251,15 +256,18 @@ ResultsObj.prototype.showResults = function() {
             val.doc.result = val.doc.result || 'NF';
             return val.doc;
         });
-        var resultsTable = $('#results-table').DataTable( {
+        var resultsTable = $('#results-table').DataTable({
             destroy: true,
             select: true,
             rowGroup: {
                 dataSrc: 'category'
             },
-            orderFixed: [[0, 'asc'], [1, 'asc']],
+            orderFixed: [
+                [0, 'asc'],
+                [1, 'asc']
+            ],
             data: data,
-            columnDefs: [{visible: false, targets: [0]}],
+            columnDefs: [{ visible: false, targets: [0] }],
             columns: [
                 { data: "category" },
                 { data: "result" },
@@ -269,9 +277,9 @@ ResultsObj.prototype.showResults = function() {
                 { data: "p2name" },
                 { data: "p2addr2" }
             ]
-        } );
+        });
         resultsTable.on('select', function(e, dt, type, indexes) {
-            var rowData = dt.rows( indexes ).data().toArray()[0];
+            var rowData = dt.rows(indexes).data().toArray()[0];
             that.editResult(rowData);
             $('#addresult-tab').tab('show');
         })
@@ -287,8 +295,13 @@ ro.entryformobj = document.getElementById("registration_form");
 ro.entriesobj = document.getElementById('entries-table');
 ro.addresultobj = document.getElementById('add_result');
 
-ro.entryformobj.addEventListener('submit', function (e) {
+ro.entryformobj.addEventListener('submit', function(e) {
     e.preventDefault();
+    e.stopPropagation();
+    ro.entryformobj.classList.add("was-validated");
+    if (ro.entryformobj.checkValidity() === false) {
+        return;
+    }
     ro.saveRegistration();
 });
 
@@ -306,33 +319,34 @@ function slugify(string) {
     const a = 'àáäâãåăæąçćčđďèéěėëêęğǵḧìíïîįłḿǹńňñòóöôœøṕŕřßşśšșťțùúüûǘůűūųẃẍÿýźžż·/_,:;'
     const b = 'aaaaaaaaacccddeeeeeeegghiiiiilmnnnnooooooprrsssssttuuuuuuuuuwxyyzzz------'
     const p = new RegExp(a.split('').join('|'), 'g')
-  
+
     return string.toString().toLowerCase()
-      .replace(/\s+/g, '-') // Replace spaces with -
-      .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
-      .replace(/&/g, '-and-') // Replace & with 'and'
-      .replace(/[^\w\-]+/g, '') // Remove all non-word characters
-      .replace(/\-\-+/g, '-') // Replace multiple - with single -
-      .replace(/^-+/, '') // Trim - from start of text
-      .replace(/-+$/, '') // Trim - from end of text
-  }
+        .replace(/\s+/g, '-') // Replace spaces with -
+        .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
+        .replace(/&/g, '-and-') // Replace & with 'and'
+        .replace(/[^\w\-]+/g, '') // Remove all non-word characters
+        .replace(/\-\-+/g, '-') // Replace multiple - with single -
+        .replace(/^-+/, '') // Trim - from start of text
+        .replace(/-+$/, '') // Trim - from end of text
+}
 
 // Initialization
 document.title = title;
 $('#inner-title').html(title);
 age_categories.forEach(function(item, index) {
+    var feedback = index == age_categories.length - 1 ? `<div class="invalid-feedback"><div class="form-check">Please enter an age category</div></div>` : "";
     $('#age-category').append(`<div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="ageCategory" value="${item}">
-    <label class="form-check-label">${item}</label>
-    </div>`
-    );
+        <input class="form-check-input" type="radio" name="ageCategory" value="${item}" required/>
+        <label class="form-check-label">${item}</label>
+        ${feedback}
+        </div>`);
 });
 for (var category in boat_classes) {
     var classes = boat_classes[category];
     var inner = "";
     classes.forEach(function(item, index) {
         inner = inner.concat(`<div class="form-check offset-sm-1 col-sm-2">
-        <input class="form-check-input" type="radio" name="boatClass" value="${item}"/>
+        <input class="form-check-input" type="radio" name="boatClass" value="${item}" required/>
         <label class="form-check-label">${item}</label>
       </div>
         `)
