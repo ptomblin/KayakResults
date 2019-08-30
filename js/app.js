@@ -2,10 +2,10 @@
 var title = "Saranac Lake 12 Miler";
 var age_categories = ["Under 50", "Over 50", "Mixed"];
 var boat_classes = {
-    "Guideboat": ["1 Person Guideboat", "2 Person Guideboat", "Open Touring Guideboat"],
-    "Kayak": ["K-1 Recreational", "K-1 Touring", "K-1 Unlimited", "2 Person Kayak"],
+    "Guideboat": ["1 Person", "2 Person", "Open Touring"],
+    "Kayak": ["Recreational", "K-1 Touring", "K-1 Unlimited", "2 Person Kayak"],
     "Canoe": ["Solo Recreational", "C-1 Stock", "C-2 Stock", "C-2 Amateur", "C-4 Stock", "Voyageur"],
-    "SUP": ["12'6\" SUP", "14' SUP"]
+    "SUP": ["12'6\" Class", "14' Class"]
 };
 
 
@@ -78,13 +78,15 @@ ResultsObj.prototype.saveRegistration = function() {
     // o.p2age = this.entryformobj.p2age.value;
     // o.p1email = this.entryformobj.p1email.value;
     // o.p2email = this.entryformobj.p2email.value;
-    o.ageCategory = this.entryformobj.ageCategory.value;
-    o.genderCategory = this.entryformobj.genderCategory.value;
+    o.agecategory = this.entryformobj.agecategory.value;
+    o.gendercategory = this.entryformobj.gendercategory.value;
     // o.awaMember = this.entryformobj.awaMember.value;
     // o.nymcraMember = this.entryformobj.nymcraMember.value;
     o.boatnumber = this.entryformobj.boatnumber.value;
-    o.boatClass = this.entryformobj.boatClass.value;
-    o.category = o.boatClass + ' ' + o.ageCategory + ' ' + o.genderCategory;
+    var cat_class = this.entryformobj.boatclass.value.split('/');
+    o.boatcategory = cat_class.length > 0 ? cat_class[0] : '';
+    o.boatclass = cat_class.length > 0 ? cat_class[1]: '';
+    o.category = o.boatcategory + ' ' + o.boatclass + ' ' + o.agecategory + ' ' + o.gendercategory;
     o.modified = new Date().getTime();
     this.pdb.put(o).then(function(response) {
         that.reporter(response);
@@ -128,12 +130,12 @@ ResultsObj.prototype.editEntry = function(rowData) {
         // this.entryformobj.p2age.value = rowData.p2age
         // this.entryformobj.p1email.value = rowData.p1email
         // this.entryformobj.p2email.value = rowData.p2email
-    this.entryformobj.ageCategory.value = rowData.ageCategory
-    this.entryformobj.genderCategory.value = rowData.genderCategory
+    this.entryformobj.agecategory.value = rowData.agecategory
+    this.entryformobj.gendercategory.value = rowData.gendercategory
         // this.entryformobj.awaMember.value = rowData.awaMember
         // this.entryformobj.nymcraMember.value = rowData.nymcraMember
     this.entryformobj.boatnumber.value = rowData.boatnumber
-    this.entryformobj.boatClass.value = rowData.boatClass
+    this.entryformobj.boatclass.value = rowData.boatcategory + '/' + rowData.boatclass
     $('#entry-tab').tab('show');
 }
 
@@ -148,15 +150,19 @@ ResultsObj.prototype.showEntry = function() {
     var boatNumber = $('#add_result_boat_number').val();
     that.pdb.find({
         selector: { boatnumber: boatNumber },
-        fields: ['_id', 'p1name', 'p2name', 'boatClass', 'result']
+        fields: ['_id', 'p1name', 'p2name', 'boatcategory', 'boatclass', 'result']
     }).then(function(response) {
         that.reporter(response);
         if (response.docs.length <= 0) {
-            // do something - number not found
+            that.resetAddResultsForm(boatNumber);
+            $('#add_result_boat_number').addClass('is-invalid');
             return;
         }
+        $('#add_result_boat_number').removeClass('is-invalid');
+        $('#add_result_submit').attr('disabled', false);
         var results = response.docs[0];
-        $('#add_result_class').val(results.boatClass);
+        $('#add_result_category').val(results.boatcategory);
+        $('#add_result_class').val(results.boatclass);
         $('#add_result_person1').val(results.p1name);
         $('#add_result_person2').val(results.p2name);
         $('#add_result_result').val(results.result);
@@ -164,12 +170,14 @@ ResultsObj.prototype.showEntry = function() {
     }).catch(function(error) {
         that.reporter(error);
     });
-
 }
 
-ResultsObj.prototype.resetAddResultsForm = function() {
-    $('#add_result_boat_number').val('');
+ResultsObj.prototype.resetAddResultsForm = function(boatNumber) {
+    $('#add_result_boat_number').removeClass('is-invalid');
+    $('#add_result_submit').attr('disabled', true);
+    $('#add_result_boat_number').val(boatNumber);
     $('#add_result_result').val('');
+    $('#add_result_category').val('');
     $('#add_result_class').val('');
     $('#add_result_person1').val('');
     $('#add_result_person2').val('');
@@ -179,7 +187,8 @@ ResultsObj.prototype.resetAddResultsForm = function() {
 ResultsObj.prototype.editResult = function(rowData) {
     $('#add_result_boat_number').val(rowData.boatnumber);
     $('#add_result_result').val(rowData.result);
-    $('#add_result_class').val(rowData.boatClass);
+    $('#add_result_category').val(rowData.boatcategory);
+    $('#add_result_class').val(rowData.boatclass);
     $('#add_result_person1').val(rowData.p1name);
     $('#add_result_person2').val(rowData.p2name);
     $('#add_result_id').val(rowData._id);
@@ -193,7 +202,7 @@ ResultsObj.prototype.saveResult = function() {
     }).then(function(response) {
         that.reporter(response);
         if (response && response.ok) {
-            that.resetAddResultsForm();
+            that.resetAddResultsForm('');
         }
     }).catch(function(error) {
         that.reporter("error = " + error);
@@ -220,14 +229,16 @@ ResultsObj.prototype.showEntries = function() {
             orderFixed: [
                 [0, 'asc'],
                 [1, 'asc'],
-                [2, 'asc']
+                [2, 'asc'],
+                [3, 'asc']
             ],
             data: data,
-            columnDefs: [{ visible: false, targets: [0, 1, 2] }],
+            columnDefs: [{ visible: false, targets: [0, 1, 2, 3] }],
             columns: [
-                { data: "boatClass" },
-                { data: "ageCategory" },
-                { data: "genderCategory" },
+                { data: "boatcategory" },
+                { data: "boatclass" },
+                { data: "agecategory" },
+                { data: "gendercategory" },
                 { data: "boatnumber" },
                 { data: "p1name" },
                 { data: "p1addr2" },
@@ -288,6 +299,32 @@ ResultsObj.prototype.showResults = function() {
         // do something
     });
 }
+ResultsObj.prototype.checkForDuplicates = function(callback) {
+    // If there is another entry with the same boat number and different _id, then
+    // validation fails and so we don't save.
+    var that = this;
+    var boatNumber = $('#boatnumber').val();
+    this.entryformobj.classList.remove('was-validated');
+    var id = $('#_id').val();
+    var retval = false;
+    that.pdb.find({
+        selector: { boatnumber: boatNumber },
+        fields: ['_id']
+    }).then(function(response) {
+        that.reporter(response);
+        if (response.docs.length > 0) {
+            if (response.docs.some(val => val._id != id)) {
+                $('#boatnumber').addClass('is-invalid');
+                return;
+            }
+        }
+        $('#boatnumber').removeClass('is-invalid');
+        callback instanceof Function && callback();
+    }).catch(function(error) {
+        that.reporter(error);
+    });
+
+}
 
 ro = new ResultsObj('kayakresults');
 
@@ -302,16 +339,17 @@ ro.entryformobj.addEventListener('submit', function(e) {
     if (ro.entryformobj.checkValidity() === false) {
         return;
     }
-    ro.saveRegistration();
+    ro.checkForDuplicates(ro.saveRegistration.bind(ro));
 });
 
 $('#deleteEntry').on('click', ro.deleteEntry.bind(ro));
 $('#clearEntry').on('click', ro.resetEntryForm.bind(ro));
 $('#add_result_boat_number').on('focusout blur', ro.showEntry.bind(ro));
 $('#add_result_submit').on('click', ro.saveResult.bind(ro));
+$('#boatnumber').on('focusout blur', ro.checkForDuplicates.bind(ro));
 
 $('#entries-tab').on('show.bs.tab', ro.showEntries.bind(ro));
-$('#addresult-tab').on('hide.bs.tab', ro.resetAddResultsForm);
+$('#addresult-tab').on('hide.bs.tab', (function() { return ro.resetAddResultsForm('')}()));
 $('#entry-tab').on('hide.bs.tab', ro.resetEntryForm.bind(ro));
 $('#results-tab').on('show.bs.tab', ro.showResults.bind(ro));
 
@@ -330,13 +368,30 @@ function slugify(string) {
         .replace(/-+$/, '') // Trim - from end of text
 }
 
+function htmlEscape(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+function htmlUnescape(str) {
+    return str
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&');
+}
+
 // Initialization
 document.title = title;
-$('#inner-title').html(title);
+$('#inner-title').html(htmlEscape(title));
 age_categories.forEach(function(item, index) {
     var feedback = index == age_categories.length - 1 ? `<div class="invalid-feedback"><div class="form-check">Please enter an age category</div></div>` : "";
     $('#age-category').append(`<div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="ageCategory" value="${item}" required/>
+        <input class="form-check-input" type="radio" name="agecategory" value="${htmlEscape(item)}" required/>
         <label class="form-check-label">${item}</label>
         ${feedback}
         </div>`);
@@ -346,13 +401,13 @@ for (var category in boat_classes) {
     var inner = "";
     classes.forEach(function(item, index) {
         inner = inner.concat(`<div class="form-check offset-sm-1 col-sm-2">
-        <input class="form-check-input" type="radio" name="boatClass" value="${item}" required/>
+        <input class="form-check-input" type="radio" name="boatclass" value="${htmlEscape(category+'/'+item)}" required/>
         <label class="form-check-label">${item}</label>
       </div>
         `)
     });
     $('#boat-classes').append(`<div class="form-group row">
-    <div class="offset-sm-1 col-sm-11"><h4>${category}</h4></div></div>
+    <div class="offset-sm-1 col-sm-11"><h4>${htmlEscape(category)}</h4></div></div>
     <div class="form-group row">${inner}</div>
     `)
 };
