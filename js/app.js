@@ -167,40 +167,44 @@ ResultsObj.prototype.showEntry = function() {
             $('#add_result_boat_number').addClass('is-invalid');
             return;
         }
-        $('#add_result_boat_number').removeClass('is-invalid');
         $('#add_result_submit').attr('disabled', false);
-        var results = response.docs[0];
-        $('#add_result_category').val(results.boatcategory);
-        $('#add_result_class').val(results.boatclass);
-        $('#add_result_person1').val(results.p1name);
-        $('#add_result_person2').val(results.p2name);
-        $('#add_result_result').val(results.result);
-        $('#add_result_id').val(results._id);
+        that.updateResultBoatInfo(response.docs[0]);
     }).catch(function(error) {
         that.reporter(error);
     });
 };
 
-ResultsObj.prototype.resetAddResultsForm = function(boatNumber) {
+ResultsObj.prototype.updateResultBoatInfo = function(record) {
     $('#add_result_boat_number').removeClass('is-invalid');
+    $('#add_result_category').addClass('readonly-highlight').val(record.boatcategory);
+    $('#add_result_class').addClass('readonly-highlight').val(record.boatclass);
+    $('#add_result_person1').addClass('readonly-highlight').val(record.p1name);
+    if (record.p2name != "") {
+        $('#add_result_person2').removeClass('invisible').addClass('readonly-highlight').val(record.p2name);
+    } else {
+        $('#add_result_person2').removeClass('readonly-highlight').addClass('invisible');
+    }
+    $('#add_result_result').val(record.result);
+    $('#add_result_id').val(record._id);
+    $('#add_result_result').focus().select();
+}
+
+ResultsObj.prototype.resetAddResultsForm = function(boatNumber) {
     $('#add_result_submit').attr('disabled', true);
-    $('#add_result_boat_number').val(boatNumber);
+    $('#add_result_boat_number').removeClass('is-invalid').focus().select().val(boatNumber);
     $('#add_result_result').val('');
-    $('#add_result_category').val('');
-    $('#add_result_class').val('');
-    $('#add_result_person1').val('');
-    $('#add_result_person2').val('');
+    $('#add_result_category').removeClass('readonly-highlight').val('');
+    $('#add_result_class').removeClass('readonly-highlight').val('');
+    $('#add_result_person1').removeClass('readonly-highlight').val('');
+    $('#add_result_person2').removeClass('readonly-highlight').removeClass('invisible').val('');
     $('#add_result_id').val('');
 };
 
 ResultsObj.prototype.editResult = function(rowData) {
+    $('#add_result_submit').attr('disabled', false);
     $('#add_result_boat_number').val(rowData.boatnumber);
     $('#add_result_result').val(rowData.result);
-    $('#add_result_category').val(rowData.boatcategory);
-    $('#add_result_class').val(rowData.boatclass);
-    $('#add_result_person1').val(rowData.p1name);
-    $('#add_result_person2').val(rowData.p2name);
-    $('#add_result_id').val(rowData._id);
+    this.updateResultBoatInfo(rowData);
 };
 
 ResultsObj.prototype.saveResult = function() {
@@ -358,6 +362,14 @@ ResultsObj.prototype.setCrewFields = function(hasCrew) {
     }
 };
 
+ResultsObj.prototype.addResultTabFocus = function() {
+    if ($('#add_result_boat_number').val() == '') {
+        $('#add_result_boat_number').focus().select();
+    } else {
+        $('#add_result_result').focus().select();
+    }
+}
+
 var ro = new ResultsObj('kayakresults');
 
 ro.entryformobj = document.getElementById('registration_form');
@@ -438,10 +450,12 @@ $('#deleteEntry').on('click', ro.deleteEntry.bind(ro));
 $('#clearEntry').on('click', ro.resetEntryForm.bind(ro));
 $('#add_result_boat_number').on('focusout blur', ro.showEntry.bind(ro));
 $('#add_result_submit').on('click', ro.saveResult.bind(ro));
+$('#add_result_clear').on('click', function() { return ro.resetAddResultsForm(''); });
 $('#boatnumber').on('focusout blur', ro.checkForDuplicates.bind(ro));
 $('input[name="boatclass"]').change(ro.boatClassChanged.bind(ro));
 
 $('#entries-tab').on('show.bs.tab', ro.showEntries.bind(ro));
-$('#addresult-tab').on('hide.bs.tab', (function() { return ro.resetAddResultsForm(''); }()));
+$('#addresult-tab').on('shown.bs.tab', ro.addResultTabFocus.bind(ro));
+$('#addresult-tab').on('hide.bs.tab', function() { return ro.resetAddResultsForm(''); });
 $('#entry-tab').on('hide.bs.tab', ro.resetEntryForm.bind(ro));
 $('#results-tab').on('show.bs.tab', ro.showResults.bind(ro));

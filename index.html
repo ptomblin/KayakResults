@@ -12,6 +12,9 @@
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/datatables.min.css">
 
+  <!-- UI Tweaks -->
+  <link rel="stylesheet" href="css/app.css">
+
   <title>Tupper Lake 8 Miler!</title>
 </head>
 
@@ -232,8 +235,10 @@
           <label for="add_result_result" class="col-sm-2 col-form-label">Result</label>
           <div class="col-sm-2"><input class="form-control" type="text" id="add_result_result" name="add_result_result"
               placeholder="Time" /></div>
-          <div class="col-sm-2"><button class="btn btn-primary" id="add_result_submit" name="add_result_submit">Save
-              Result</button></div>
+          <div class="col-sm-4">
+            <button class="btn btn-primary" id="add_result_submit" name="add_result_submit">Save Result</button>
+            <button class="btn btn-warning" id="add_result_clear" name="add_result_clear">Clear Result</button>
+          </div>
         </div>
         <div class="form-group row">
           <input type="hidden" id="add_result_id" name="add_result_id" />
@@ -276,6 +281,8 @@
           <li>Configurable boat classes</li>
           <li>Configurable age classes</li>
           <li>Printing</li>
+          <li>Wave configuration - which boat classes in each wave, time offset in each wave</li>
+          <li>Time type - hh:mm:ss, mmm:ss, mmm.dd?</li>
           <li>what am I missing?</li>
         </ul>
       </div>
