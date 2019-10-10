@@ -123,6 +123,10 @@ ResultsObj.prototype.deleteEntry = function() {
 };
 
 ResultsObj.prototype.editEntry = function(rowData) {
+    this.entryformobj.boatnumber.value = rowData.boatnumber;
+    this.entryformobj.boatclass.value = rowData.boatcategory + '/' + rowData.boatclass;
+    var bc = boat_classes[rowData.boatcategory].filter(b => b.name == rowData.boatclass)[0];
+    this.setCrewFields(bc.hasCrew);
     this.entryformobj._id.value = rowData._id;
     this.entryformobj._rev.value = rowData._rev;
     this.entryformobj.p1name.value = rowData.p1name;
@@ -141,8 +145,6 @@ ResultsObj.prototype.editEntry = function(rowData) {
     this.entryformobj.gendercategory.value = rowData.gendercategory;
     // this.entryformobj.awaMember.value = rowData.awaMember
     // this.entryformobj.nymcraMember.value = rowData.nymcraMember
-    this.entryformobj.boatnumber.value = rowData.boatnumber;
-    this.entryformobj.boatclass.value = rowData.boatcategory + '/' + rowData.boatclass;
     $('#entry-tab').tab('show');
 };
 
@@ -333,25 +335,26 @@ ResultsObj.prototype.checkForDuplicates = function(callback) {
 };
 
 ResultsObj.prototype.boatClassChanged = function(event) {
-    var that = this;
-    that.reporter(event);
-    var hasCrew = event.target.dataset.hasCrew == 'true';
+    this.setCrewFields(event.target.dataset.hasCrew == 'true');
+};
+
+ResultsObj.prototype.setCrewFields = function(hasCrew) {
     if (hasCrew) {
-        that.entryformobj.p2name.removeAttribute('disabled');
-        that.entryformobj.p2name.setAttribute('required', 'required');
-        that.entryformobj.p2addr2.removeAttribute('disabled');
-        that.entryformobj.agecategory.item(2).removeAttribute('disabled');
-        that.entryformobj.gendercategory.item(2).removeAttribute('disabled');
+        this.entryformobj.p2name.removeAttribute('disabled');
+        this.entryformobj.p2name.setAttribute('required', 'required');
+        this.entryformobj.p2addr2.removeAttribute('disabled');
+        this.entryformobj.agecategory.item(2).removeAttribute('disabled');
+        this.entryformobj.gendercategory.item(2).removeAttribute('disabled');
     } else {
-        that.entryformobj.p2name.setAttribute('disabled', 'disabled');
-        that.entryformobj.p2name.removeAttribute('required');
-        that.entryformobj.p2name.value = '';
-        that.entryformobj.p2addr2.setAttribute('disabled', 'disabled');
-        that.entryformobj.p2addr2.value = '';
-        that.entryformobj.agecategory.item(2).setAttribute('disabled', 'disabled');
-        that.entryformobj.agecategory.item(2).checked = false;
-        that.entryformobj.gendercategory.item(2).setAttribute('disabled', 'disabled');
-        that.entryformobj.gendercategory.item(2).checked = false;
+        this.entryformobj.p2name.setAttribute('disabled', 'disabled');
+        this.entryformobj.p2name.removeAttribute('required');
+        this.entryformobj.p2name.value = '';
+        this.entryformobj.p2addr2.setAttribute('disabled', 'disabled');
+        this.entryformobj.p2addr2.value = '';
+        this.entryformobj.agecategory.item(2).setAttribute('disabled', 'disabled');
+        this.entryformobj.agecategory.item(2).checked = false;
+        this.entryformobj.gendercategory.item(2).setAttribute('disabled', 'disabled');
+        this.entryformobj.gendercategory.item(2).checked = false;
     }
 };
 
