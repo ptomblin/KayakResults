@@ -152,6 +152,7 @@ ResultsObj.prototype.resetEntryForm = function() {
     this.entryformobj.reset();
     this.entryformobj._id.value = '';
     this.entryformobj._rev.value = '';
+    this.setCrewFields(true);
 };
 
 ResultsObj.prototype.showEntry = function() {
