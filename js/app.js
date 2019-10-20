@@ -180,7 +180,7 @@ ResultsObj.prototype.updateResultBoatInfo = function(record) {
     $('#add_result_category').addClass('readonly-highlight').val(record.boatcategory);
     $('#add_result_class').addClass('readonly-highlight').val(record.boatclass);
     $('#add_result_person1').addClass('readonly-highlight').val(record.p1name);
-    if (record.p2name != "") {
+    if (record.p2name != '') {
         $('#add_result_person2').removeClass('invisible').addClass('readonly-highlight').val(record.p2name);
     } else {
         $('#add_result_person2').removeClass('readonly-highlight').addClass('invisible');
@@ -188,7 +188,7 @@ ResultsObj.prototype.updateResultBoatInfo = function(record) {
     $('#add_result_result').val(record.result);
     $('#add_result_id').val(record._id);
     $('#add_result_result').focus().select();
-}
+};
 
 ResultsObj.prototype.resetAddResultsForm = function(boatNumber) {
     $('#add_result_submit').attr('disabled', true);
@@ -241,29 +241,31 @@ ResultsObj.prototype.showEntries = function() {
                 dataSrc: 'category'
             },
             orderFixed: [
-                [0, 'asc'],
-                [1, 'asc'],
-                [2, 'asc'],
-                [3, 'asc']
+                [0, 'asc']
             ],
             data: data,
-            columnDefs: [{ visible: false, targets: [0, 1, 2, 3] }],
+            columnDefs: [{ visible: false, targets: [0] }],
             columns: [
-                { data: 'boatcategory' },
-                { data: 'boatclass' },
-                { data: 'agecategory' },
-                { data: 'gendercategory' },
+                { data: 'category' },
                 { data: 'boatnumber' },
                 { data: 'p1name' },
                 { data: 'p1addr2' },
                 { data: 'p2name' },
                 { data: 'p2addr2' }
+            ],
+            searching: false,
+            lengthChange: true,
+            buttons: [
+                'print',
+                'pdfHtml5',
+                'csvHtml5'
             ]
         });
         entryTable.on('select', function(e, dt, type, indexes) {
             var rowData = dt.rows(indexes).data().toArray()[0];
             that.editEntry(rowData);
         });
+        $('#entries-tab-button-div').append(entryTable.buttons().container());
     }).catch(function(error) {
         that.reporter(error);
         // do something
@@ -301,8 +303,14 @@ ResultsObj.prototype.showResults = function() {
                 { data: 'p1addr2' },
                 { data: 'p2name' },
                 { data: 'p2addr2' }
+            ],
+            buttons: [
+                'print',
+                'pdfHtml5',
+                'csvHtml5'
             ]
         });
+        $('#results-tab-button-div').append(resultsTable.buttons().container());
         resultsTable.on('select', function(e, dt, type, indexes) {
             var rowData = dt.rows(indexes).data().toArray()[0];
             that.editResult(rowData);
@@ -369,7 +377,7 @@ ResultsObj.prototype.addResultTabFocus = function() {
     } else {
         $('#add_result_result').focus().select();
     }
-}
+};
 
 var ro = new ResultsObj('kayakresults');
 

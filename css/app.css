@@ -1,5 +1,16 @@
-.readonly-highlight {
-    color: #fff!important;
-    background-color: #17a2b8!important;
-    padding-left: .4rem;
-}
+    .readonly-highlight {
+        color: #fff!important;
+        background-color: #17a2b8!important;
+        padding-left: .4rem;
+    }
+    
+    @media print {
+        body {
+            min-width: 0!important;
+        }
+        .table-striped tbody tr:nth-of-type(2n+1),
+        .table-striped tbody tr:nth-of-type(2n+1) td,
+        .table-striped tbody tr:nth-of-type(2n+1) th {
+            background-color: #e0e0e0!important;
+        }
+    }
