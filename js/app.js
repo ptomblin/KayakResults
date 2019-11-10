@@ -40,7 +40,23 @@ var ResultsObj = function(databasename, remoteorigin) {
         that.reporter('err = ' + err);
     });
     //this.pdb.on('error', function(err) {}); DO SOMETHING
-    this.remote = remoteorigin + '/' + databasename;
+    if (remoteorigin) {
+        this.remote = remoteorigin + '/' + databasename;
+        this.setupSync(databasename, this.remote);
+    }
+};
+
+ResultsObj.prototype.setupSync = function(databasename, remote) {
+    var that = this;
+    this.sync = PouchDB.sync(databasename, remote, { live: true, retry: true })
+        .on('change', function(info) {
+            that.reporter('on change ' + info);
+            if (info.direction == 'pull') {
+                that.reporter("it's a pull");
+            }
+        }).on('error', function(error) {
+            that.reporter('sync error ' + error);
+        });
 };
 
 /*
@@ -379,7 +395,7 @@ ResultsObj.prototype.addResultTabFocus = function() {
     }
 };
 
-var ro = new ResultsObj('kayakresults');
+var ro = new ResultsObj('kayakresults', 'http://127.0.0.1:5984');
 
 ro.entryformobj = document.getElementById('registration_form');
 ro.entriesobj = document.getElementById('entries-table');
