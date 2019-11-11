@@ -141,7 +141,7 @@ ResultsObj.prototype.deleteEntry = function() {
 ResultsObj.prototype.editEntry = function(rowData) {
     this.entryformobj.boatnumber.value = rowData.boatnumber;
     this.entryformobj.boatclass.value = rowData.boatcategory + '/' + rowData.boatclass;
-    var bc = boat_classes[rowData.boatcategory].filter(b => b.name == rowData.boatclass)[0];
+    var bc = boat_classes[rowData.boatcategory].filter(function(b) { return b.name == rowData.boatclass;})[0];
     this.setCrewFields(bc.hasCrew);
     this.entryformobj._id.value = rowData._id;
     this.entryformobj._rev.value = rowData._rev;
@@ -351,7 +351,7 @@ ResultsObj.prototype.checkForDuplicates = function(callback) {
     }).then(function(response) {
         that.reporter(response);
         if (response.docs.length > 0) {
-            if (response.docs.some(val => val._id != id)) {
+            if (response.docs.some(function(val) { return val._id != id; })) {
                 $('#boatnumber').addClass('is-invalid');
                 return;
             }
@@ -418,7 +418,7 @@ function slugify(string) {
 
     return string.toString().toLowerCase()
         .replace(/\s+/g, '-') // Replace spaces with -
-        .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
+        .replace(p, function(c) { return b.charAt(a.indexOf(c)); }) // Replace special characters
         .replace(/&/g, '-and-') // Replace & with 'and'
         .replace(/[^\w-]+/g, '') // Remove all non-word characters
         .replace(/--+/g, '-') // Replace multiple - with single -
