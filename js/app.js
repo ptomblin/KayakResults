@@ -520,6 +520,10 @@ function htmlUnescape(str) {
         .replace(/&amp;/g, '&');
 }
 
+function recordSelectedTab(e) {
+    window.sessionStorage.setItem('current_tab', e.target.attributes['id'].value);
+}
+
 // Initialization
 document.title = title;
 $('#inner-title').html(htmlEscape(title));
@@ -547,6 +551,8 @@ for (var category in boat_classes) {
     `);
 }
 
+$('a[data-toggle="tab"]').on('shown.bs.tab', recordSelectedTab);
+
 $('#deleteEntry').on('click', ro.deleteEntry.bind(ro));
 $('#clearEntry').on('click', ro.resetEntryForm.bind(ro));
 $('#add_result_boat_number').on('focusout blur', ro.showEntry.bind(ro));
@@ -560,3 +566,7 @@ $('#addresult-tab').on('shown.bs.tab', ro.addResultTabFocus.bind(ro));
 $('#addresult-tab').on('hide.bs.tab', function() { return ro.resetAddResultsForm(''); });
 $('#entry-tab').on('hide.bs.tab', ro.resetEntryForm.bind(ro));
 $('#results-tab').on('show.bs.tab', ro.showResults.bind(ro));
+
+if (window.sessionStorage.getItem('current_tab')) {
+    $('#'+window.sessionStorage.getItem('current_tab')).tab('show');
+}
