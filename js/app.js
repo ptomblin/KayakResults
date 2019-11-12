@@ -332,6 +332,7 @@ ResultsObj.prototype.showResults = function() {
             }
             if (doc.result) {
                 doc.position = ++lastPos;
+                doc.result = (doc.result.hhmmssToDate() - initDate).millisecondsToHHMMSS();
                 doc.behindLeader = (doc.resDate - catLeader).millisecondsToHHMMSS();
                 doc.behindPrev = (doc.resDate - prevTime).millisecondsToHHMMSS();
                 prevTime = doc.resDate;
@@ -349,10 +350,10 @@ ResultsObj.prototype.showResults = function() {
             rowGroup: {
                 dataSrc: 'category'
             },
-            /*orderFixed: [
+            orderFixed: [
                 [0, 'asc'],
-                [1, 'asc']
-            ],*/
+                // [1, 'asc']
+            ],
             data: data,
             columnDefs: [{ visible: false, targets: [0] }],
             columns: [
@@ -458,18 +459,21 @@ ro.entryformobj.addEventListener('submit', function(e) {
     ro.checkForDuplicates(ro.saveRegistration.bind(ro));
 });
 
+var initDate = new Date(2000, 1, 1);
+initDate.setUTCHours(0);
+initDate.setUTCMinutes(0);
+initDate.setUTCSeconds(0);
+initDate.setUTCMinutes(0)
+
 String.prototype.hhmmssToDate = function() {
-    var d = new Date();
-    d.setHours(0);
-    d.setMinutes(0);
-    d.setSeconds(0);
+    var d = new Date(initDate.getTime());
     var numbers = this.match(/[\d.]+/g).map(Number);
-    d.setSeconds(numbers.pop());
+    d.setUTCSeconds(numbers.pop());
     if (numbers.length > 0) {
-        d.setMinutes(numbers.pop());
+        d.setUTCMinutes(numbers.pop());
     }
     if (numbers.length > 0) {
-        d.setHours(numbers.pop());
+        d.setUTCHours(numbers.pop());
     }
     return d;
 };
