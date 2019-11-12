@@ -52,7 +52,7 @@ ResultsObj.prototype.setupSync = function(databasename, remote) {
         .on('change', function(info) {
             that.reporter('on change ' + info);
             if (info.direction == 'pull') {
-                that.reporter("it's a pull");
+                that.reporter('it\'s a pull');
             }
         }).on('error', function(error) {
             that.reporter('sync error ' + error);
@@ -141,7 +141,7 @@ ResultsObj.prototype.deleteEntry = function() {
 ResultsObj.prototype.editEntry = function(rowData) {
     this.entryformobj.boatnumber.value = rowData.boatnumber;
     this.entryformobj.boatclass.value = rowData.boatcategory + '/' + rowData.boatclass;
-    var bc = boat_classes[rowData.boatcategory].filter(function(b) { return b.name == rowData.boatclass;})[0];
+    var bc = boat_classes[rowData.boatcategory].filter(function(b) { return b.name == rowData.boatclass; })[0];
     this.setCrewFields(bc.hasCrew);
     this.entryformobj._id.value = rowData._id;
     this.entryformobj._rev.value = rowData._rev;
@@ -293,11 +293,55 @@ ResultsObj.prototype.showResults = function() {
     var that = this;
     this.pdb.allDocs({ 'include_docs': true }).then(function(response) {
         that.reporter(response);
+        var lastPos = 0;
+        var lastCat = '';
+        var catLeader = null;
+        var prevTime = null;
         var data = response.rows.filter(function(val) {
             return Boolean(val.doc.category);
         }).map(function(val) {
-            val.doc.result = val.doc.result || 'NF';
+            if (val.doc.result) {
+                val.doc.resDate = val.doc.result.hhmmssToDate();
+            } else {
+                val.doc.resDate = null;
+            }
             return val.doc;
+        }).sort(function(a, b) {
+            if (a.category < b.category) {
+                return -1;
+            }
+            if (a.category > b.category) {
+                return 1;
+            }
+            if (a.resDate && b.resDate) {
+                return a.resDate - b.resDate;
+            }
+            if (a.result) {
+                return -1;
+            }
+            if (b.result) {
+                return 1;
+            }
+            return 0;
+        }).map(function(doc) {
+            if (doc.category != lastCat) {
+                lastCat = doc.category;
+                lastPos = 0;
+                catLeader = doc.resDate;
+                prevTime = doc.resDate;
+            }
+            if (doc.result) {
+                doc.position = ++lastPos;
+                doc.behindLeader = (doc.resDate - catLeader).millisecondsToHHMMSS();
+                doc.behindPrev = (doc.resDate - prevTime).millisecondsToHHMMSS();
+                prevTime = doc.resDate;
+            } else {
+                doc.position = 'NF';
+                doc.result = 'NF';
+                doc.behindLeader = 'NF';
+                doc.behindPrev = 'NF';
+            }
+            return doc;
         });
         var resultsTable = $('#results-table').DataTable({
             destroy: true,
@@ -305,15 +349,18 @@ ResultsObj.prototype.showResults = function() {
             rowGroup: {
                 dataSrc: 'category'
             },
-            orderFixed: [
+            /*orderFixed: [
                 [0, 'asc'],
                 [1, 'asc']
-            ],
+            ],*/
             data: data,
             columnDefs: [{ visible: false, targets: [0] }],
             columns: [
                 { data: 'category' },
                 { data: 'result' },
+                { data: 'position' },
+                { data: 'behindLeader' },
+                { data: 'behindPrev' },
                 { data: 'boatnumber' },
                 { data: 'p1name' },
                 { data: 'p1addr2' },
@@ -410,6 +457,31 @@ ro.entryformobj.addEventListener('submit', function(e) {
     }
     ro.checkForDuplicates(ro.saveRegistration.bind(ro));
 });
+
+String.prototype.hhmmssToDate = function() {
+    var d = new Date();
+    d.setHours(0);
+    d.setMinutes(0);
+    d.setSeconds(0);
+    var numbers = this.match(/[\d.]+/g).map(Number);
+    d.setSeconds(numbers.pop());
+    if (numbers.length > 0) {
+        d.setMinutes(numbers.pop());
+    }
+    if (numbers.length > 0) {
+        d.setHours(numbers.pop());
+    }
+    return d;
+};
+
+Number.prototype.millisecondsToHHMMSS = function() {
+    var seconds = Math.round(this / 1000);
+    var hours = Math.floor(seconds / (60 * 60));
+    var divMins = seconds % (60 * 60);
+    var mins = Math.floor(divMins / 60);
+    var secs = Math.ceil(divMins % 60);
+    return ('00' + hours).slice(-2) + ':' + ('00' + mins).slice(-2) + ':' + ('00' + secs).slice(-2);
+};
 
 function slugify(string) {
     const a = 'àáäâãåăæąçćčđďèéěėëêęğǵḧìíïîįłḿǹńňñòóöôœøṕŕřßşśšșťțùúüûǘůűūųẃẍÿýźžż·/_,:;';
