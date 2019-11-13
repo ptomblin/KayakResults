@@ -357,11 +357,14 @@ ResultsObj.prototype.showResults = function() {
         }).map(function(doc) {
             var bi = boat_classes[doc.boatcategory].filter(bi => bi.name == doc.boatclass)[0];
             if (doc.resDate) {
-                bestTime = bestTime || doc.resDate;
                 doc.position = bi.currentPos++;
+                if (!bestTime || (useCategory && doc.position == 1)) {
+                    bestTime = doc.resDate;
+                    prevTime = doc.resDate;
+                }
                 doc.result = (doc.result.hhmmssToDate() - initDate).millisecondsToHHMMSS();
-                doc.behindLeader = (doc.resDate - (bestTime || doc.resDate)).millisecondsToHHMMSS();
-                doc.behindPrev = (doc.resDate - (prevTime || doc.resDate)).millisecondsToHHMMSS();
+                doc.behindLeader = (doc.resDate - bestTime).millisecondsToHHMMSS();
+                doc.behindPrev = (doc.resDate - prevTime).millisecondsToHHMMSS();
                 prevTime = doc.resDate;
             } else {
                 doc.position = 'NF';
