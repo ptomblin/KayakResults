@@ -7,23 +7,29 @@
     .table {
         table-layout: fixed;
     }
-    
+
+    td {
+        overflow-wrap: break-word;
+    }
+
     .fixedTable {
         /* font-family: 'Courier New', Courier, monospace; */
         /* font-weight: bold; */
         text-align: right;
         font-variant-numeric: tabular-nums;
     }
-    
-    td {
-        overflow-wrap: break-word;
-    }
+
     @media print {
         @page { size: landscape}
 
         body {
             min-width: 0!important;
         }
+
+        .table {
+            font-size: .75rem;
+        }
+        
         .table-striped tbody tr:nth-of-type(2n+1),
         .table-striped tbody tr:nth-of-type(2n+1) td,
         .table-striped tbody tr:nth-of-type(2n+1) th {

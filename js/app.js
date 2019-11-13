@@ -376,7 +376,15 @@ ResultsObj.prototype.showResults = function() {
             buttons: [
                 {
                     extend: 'print',
-                    orientation: 'landscape'
+                    orientation: 'landscape',
+                    customize: function ( win ) {
+                        $(win.document.body)
+                            .css( 'font-size', '10pt' );
+     
+                        $(win.document.body).find( 'table' )
+                            .addClass( 'compact' )
+                            .css( 'font-size', 'inherit' );
+                    }
                 },
                 {
                     extend: 'pdfHtml5',
