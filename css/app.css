@@ -15,7 +15,12 @@
         font-variant-numeric: tabular-nums;
     }
     
+    td {
+        overflow-wrap: break-word;
+    }
     @media print {
+        @page { size: landscape}
+
         body {
             min-width: 0!important;
         }

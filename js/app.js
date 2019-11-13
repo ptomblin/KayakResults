@@ -263,17 +263,19 @@ ResultsObj.prototype.showEntries = function() {
             data: data,
             columns: [
                 { data: 'category', visible: false },
-                { data: 'boatnumber', className: "fixedTable", width: '2%' },
-                { data: 'p1name' },
-                { data: 'p1addr2' },
-                { data: 'p2name' },
-                { data: 'p2addr2' }
+                { data: 'boatnumber', className: "fixedTable", width: '2em' },
+                { data: 'p1name', width: "25%" },
+                { data: 'p1addr2', width: "15%" },
+                { data: 'p2name', width: "25%" },
+                { data: 'p2addr2', width: "15%" }
             ],
             searching: false,
             lengthChange: true,
             buttons: [
-                'print',
-                'pdfHtml5',
+                {
+                    extend: 'print',
+                    orientation: 'landscape'
+                },
                 'csvHtml5'
             ]
         });
@@ -361,19 +363,25 @@ ResultsObj.prototype.showResults = function() {
             data: data,
             columns: [
                 { data: 'category', visible: false },
-                { data: 'result', className: "fixedTable", width: '4%' },
-                { data: 'position', className: "fixedTable", width: "1%" },
-                { data: 'behindLeader', className: "fixedTable", width: '4%' },
-                { data: 'behindPrev', className: "fixedTable", width: '4%' },
-                { data: 'boatnumber', className: "fixedTable", width: '2%' },
-                { data: 'p1name' },
-                { data: 'p1addr2' },
-                { data: 'p2name' },
-                { data: 'p2addr2' }
+                { data: 'result', className: "fixedTable", width: '4em' },
+                { data: 'position', className: "fixedTable", width: "1em" },
+                { data: 'behindLeader', className: "fixedTable", width: '4em' },
+                { data: 'behindPrev', className: "fixedTable", width: '4em' },
+                { data: 'boatnumber', className: "fixedTable", width: '2em' },
+                { data: 'p1name', width: "25%" },
+                { data: 'p1addr2', width: "15%" },
+                { data: 'p2name', width: "25%" },
+                { data: 'p2addr2', width: "15%" }
             ],
             buttons: [
-                'print',
-                'pdfHtml5',
+                {
+                    extend: 'print',
+                    orientation: 'landscape'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    orientation: 'landscape'
+                },
                 'csvHtml5'
             ]
         });
