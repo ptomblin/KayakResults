@@ -251,7 +251,7 @@ ResultsObj.prototype.showEntries = function() {
         }).map(function(val) {
             return val.doc;
         });
-        var entryTable = $('#entries-table').DataTable({
+        that.entryTable = $('#entries-table').DataTable({
             destroy: true,
             select: true,
             rowGroup: {
@@ -261,10 +261,9 @@ ResultsObj.prototype.showEntries = function() {
                 [0, 'asc']
             ],
             data: data,
-            columnDefs: [{ visible: false, targets: [0] }],
             columns: [
-                { data: 'category' },
-                { data: 'boatnumber' },
+                { data: 'category', visible: false },
+                { data: 'boatnumber', className: "fixedTable", width: '2%' },
                 { data: 'p1name' },
                 { data: 'p1addr2' },
                 { data: 'p2name' },
@@ -278,15 +277,19 @@ ResultsObj.prototype.showEntries = function() {
                 'csvHtml5'
             ]
         });
-        entryTable.on('select', function(e, dt, type, indexes) {
+        that.entryTable.on('select', function(e, dt, type, indexes) {
             var rowData = dt.rows(indexes).data().toArray()[0];
             that.editEntry(rowData);
         });
-        $('#entries-tab-button-div').append(entryTable.buttons().container());
+        $('#entries-tab-button-div').append(that.entryTable.buttons().container());
     }).catch(function(error) {
         that.reporter(error);
         // do something
     });
+};
+
+ResultsObj.prototype.shownEntries = function() {
+    this.entryTable.columns.adjust().draw();
 };
 
 ResultsObj.prototype.showResults = function() {
@@ -345,9 +348,10 @@ ResultsObj.prototype.showResults = function() {
             }
             return doc;
         });
-        var resultsTable = $('#results-table').DataTable({
+        that.resultsTable = $('#results-table').DataTable({
             destroy: true,
             select: true,
+            autowidth: false,
             rowGroup: {
                 dataSrc: 'category'
             },
@@ -355,14 +359,13 @@ ResultsObj.prototype.showResults = function() {
                 [0, 'asc'],
             ],
             data: data,
-            columnDefs: [{ visible: false, targets: [0] }],
             columns: [
-                { data: 'category' },
-                { data: 'result' },
-                { data: 'position' },
-                { data: 'behindLeader' },
-                { data: 'behindPrev' },
-                { data: 'boatnumber' },
+                { data: 'category', visible: false },
+                { data: 'result', className: "fixedTable", width: '4%' },
+                { data: 'position', className: "fixedTable", width: "1%" },
+                { data: 'behindLeader', className: "fixedTable", width: '4%' },
+                { data: 'behindPrev', className: "fixedTable", width: '4%' },
+                { data: 'boatnumber', className: "fixedTable", width: '2%' },
                 { data: 'p1name' },
                 { data: 'p1addr2' },
                 { data: 'p2name' },
@@ -374,8 +377,8 @@ ResultsObj.prototype.showResults = function() {
                 'csvHtml5'
             ]
         });
-        $('#results-tab-button-div').append(resultsTable.buttons().container());
-        resultsTable.on('select', function(e, dt, type, indexes) {
+        $('#results-tab-button-div').append(that.resultsTable.buttons().container());
+        that.resultsTable.on('select', function(e, dt, type, indexes) {
             var rowData = dt.rows(indexes).data().toArray()[0];
             that.editResult(rowData);
             $('#addresult-tab').tab('show');
@@ -384,6 +387,10 @@ ResultsObj.prototype.showResults = function() {
         that.reporter(error);
         // do something
     });
+};
+
+ResultsObj.prototype.shownResults = function() {
+    this.resultsTable.columns.adjust().draw();
 };
 
 ResultsObj.prototype.checkForDuplicates = function(callback) {
@@ -562,10 +569,12 @@ $('#boatnumber').on('focusout blur', ro.checkForDuplicates.bind(ro));
 $('input[name="boatclass"]').change(ro.boatClassChanged.bind(ro));
 
 $('#entries-tab').on('show.bs.tab', ro.showEntries.bind(ro));
+$('#entries-tab').on('shown.bs.tab', ro.shownEntries.bind(ro));
 $('#addresult-tab').on('shown.bs.tab', ro.addResultTabFocus.bind(ro));
 $('#addresult-tab').on('hide.bs.tab', function() { return ro.resetAddResultsForm(''); });
 $('#entry-tab').on('hide.bs.tab', ro.resetEntryForm.bind(ro));
 $('#results-tab').on('show.bs.tab', ro.showResults.bind(ro));
+$('#results-tab').on('shown.bs.tab', ro.shownResults.bind(ro));
 
 if (window.sessionStorage.getItem('current_tab')) {
     $('#' + window.sessionStorage.getItem('current_tab')).tab('show');

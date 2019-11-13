@@ -4,6 +4,17 @@
         padding-left: .4rem;
     }
     
+    .table {
+        table-layout: fixed;
+    }
+    
+    .fixedTable {
+        /* font-family: 'Courier New', Courier, monospace; */
+        /* font-weight: bold; */
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+    
     @media print {
         body {
             min-width: 0!important;
