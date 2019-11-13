@@ -52,7 +52,7 @@ ResultsObj.prototype.setupSync = function(databasename, remote) {
         .on('change', function(info) {
             that.reporter('on change ' + info);
             if (info.direction == 'pull') {
-                $('.alert.alert-warning').removeClass('invisible');
+                $('.alert.alert-warning').removeClass('d-none');
                 that.reporter('it\'s a pull');
             }
         }).on('error', function(error) {
@@ -243,6 +243,7 @@ ResultsObj.prototype.saveResult = function() {
 
 ResultsObj.prototype.showEntries = function() {
     'use strict';
+    $('.alert.alert-warning').addClass('d-none')
     var that = this;
     this.pdb.allDocs({ 'include_docs': true }).then(function(response) {
         that.reporter(response);
@@ -276,6 +277,10 @@ ResultsObj.prototype.showEntries = function() {
                     extend: 'print',
                     orientation: 'landscape'
                 },
+                {
+                    extend: 'pdfHtml5',
+                    orientation: 'landscape'
+                },
                 'csvHtml5'
             ]
         });
@@ -296,6 +301,7 @@ ResultsObj.prototype.shownEntries = function() {
 
 ResultsObj.prototype.showResults = function() {
     'use strict';
+    $('.alert.alert-warning').addClass('d-none')
     var that = this;
     this.pdb.allDocs({ 'include_docs': true }).then(function(response) {
         that.reporter(response);
@@ -377,14 +383,6 @@ ResultsObj.prototype.showResults = function() {
                 {
                     extend: 'print',
                     orientation: 'landscape',
-                    customize: function ( win ) {
-                        $(win.document.body)
-                            .css( 'font-size', '10pt' );
-     
-                        $(win.document.body).find( 'table' )
-                            .addClass( 'compact' )
-                            .css( 'font-size', 'inherit' );
-                    }
                 },
                 {
                     extend: 'pdfHtml5',
@@ -463,6 +461,15 @@ ResultsObj.prototype.addResultTabFocus = function() {
         $('#add_result_boat_number').focus().select();
     } else {
         $('#add_result_result').focus().select();
+    }
+};
+
+ResultsObj.prototype.refresh = function() {
+    if ($('#entries-tab').hasClass('active')) {
+        this.showEntries();
+    }
+    if ($('#results-tab').hasClass('active')) {
+        this.showResults();
     }
 };
 
@@ -583,6 +590,7 @@ $('#add_result_submit').on('click', ro.saveResult.bind(ro));
 $('#add_result_clear').on('click', function() { return ro.resetAddResultsForm(''); });
 $('#boatnumber').on('focusout blur', ro.checkForDuplicates.bind(ro));
 $('input[name="boatclass"]').change(ro.boatClassChanged.bind(ro));
+$('button[name="refresh"]').on('click', ro.refresh.bind(ro));
 
 $('#entries-tab').on('show.bs.tab', ro.showEntries.bind(ro));
 $('#entries-tab').on('shown.bs.tab', ro.shownEntries.bind(ro));
