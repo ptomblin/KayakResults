@@ -3,6 +3,8 @@
 function BoatClass(name, hasCrew) {
     this.name = name;
     this.hasCrew = hasCrew;
+    this.bestTime = initDate;
+    this.currentPos = 1;
 }
 // This stuff should be in a config file or something:
 var title = 'Saranac Lake 12 Miler';
@@ -243,7 +245,7 @@ ResultsObj.prototype.saveResult = function() {
 
 ResultsObj.prototype.showEntries = function() {
     'use strict';
-    $('.alert.alert-warning').addClass('d-none')
+    $('.alert.alert-warning').addClass('d-none');
     var that = this;
     this.pdb.allDocs({ 'include_docs': true }).then(function(response) {
         that.reporter(response);
@@ -264,16 +266,15 @@ ResultsObj.prototype.showEntries = function() {
             data: data,
             columns: [
                 { data: 'category', visible: false },
-                { data: 'boatnumber', className: "fixedTable", width: '2em' },
-                { data: 'p1name', width: "25%" },
-                { data: 'p1addr2', width: "15%" },
-                { data: 'p2name', width: "25%" },
-                { data: 'p2addr2', width: "15%" }
+                { data: 'boatnumber', className: 'fixedTable', width: '2em' },
+                { data: 'p1name', width: '25%' },
+                { data: 'p1addr2', width: '15%' },
+                { data: 'p2name', width: '25%' },
+                { data: 'p2addr2', width: '15%' }
             ],
             searching: false,
             lengthChange: true,
-            buttons: [
-                {
+            buttons: [{
                     extend: 'print',
                     orientation: 'landscape'
                 },
@@ -299,15 +300,33 @@ ResultsObj.prototype.shownEntries = function() {
     this.entryTable.columns.adjust().draw();
 };
 
+ResultsObj.prototype.resetPositions = function() {
+    for (var category in boat_classes) {
+        var classes = boat_classes[category];
+        classes.forEach(function(item) {
+            item.bestTime = initDate;
+            item.currentPos = 1;
+        });
+    }
+};
+
+ResultsObj.prototype.clickCategory = function() {
+    var useCategory = $('input[name="usecategory"]:checked').val() == 'yes';
+    window.sessionStorage.setItem('group_by', useCategory);
+    this.showResults();
+};
+
 ResultsObj.prototype.showResults = function() {
     'use strict';
-    $('.alert.alert-warning').addClass('d-none')
+    $('.alert.alert-warning').addClass('d-none');
+
+    var useCategory = $('input[name="usecategory"]:checked').val() == 'yes';
+    this.resetPositions();
+
     var that = this;
     this.pdb.allDocs({ 'include_docs': true }).then(function(response) {
         that.reporter(response);
-        var lastPos = 0;
-        var lastCat = '';
-        var catLeader = null;
+        var bestTime = null;
         var prevTime = null;
         var data = response.rows.filter(function(val) {
             return Boolean(val.doc.category);
@@ -319,10 +338,10 @@ ResultsObj.prototype.showResults = function() {
             }
             return val.doc;
         }).sort(function(a, b) {
-            if (a.category < b.category) {
+            if (useCategory && a.category < b.category) {
                 return -1;
             }
-            if (a.category > b.category) {
+            if (useCategory && a.category > b.category) {
                 return 1;
             }
             if (a.resDate && b.resDate) {
@@ -336,17 +355,13 @@ ResultsObj.prototype.showResults = function() {
             }
             return 0;
         }).map(function(doc) {
-            if (doc.category != lastCat) {
-                lastCat = doc.category;
-                lastPos = 0;
-                catLeader = doc.resDate;
-                prevTime = doc.resDate;
-            }
-            if (doc.result) {
-                doc.position = ++lastPos;
+            var bi = boat_classes[doc.boatcategory].filter(bi => bi.name == doc.boatclass)[0];
+            if (doc.resDate) {
+                bestTime = bestTime || doc.resDate;
+                doc.position = bi.currentPos++;
                 doc.result = (doc.result.hhmmssToDate() - initDate).millisecondsToHHMMSS();
-                doc.behindLeader = (doc.resDate - catLeader).millisecondsToHHMMSS();
-                doc.behindPrev = (doc.resDate - prevTime).millisecondsToHHMMSS();
+                doc.behindLeader = (doc.resDate - (bestTime || doc.resDate)).millisecondsToHHMMSS();
+                doc.behindPrev = (doc.resDate - (prevTime || doc.resDate)).millisecondsToHHMMSS();
                 prevTime = doc.resDate;
             } else {
                 doc.position = 'NF';
@@ -356,31 +371,24 @@ ResultsObj.prototype.showResults = function() {
             }
             return doc;
         });
-        that.resultsTable = $('#results-table').DataTable({
+        var tableOptions = {
             destroy: true,
             select: true,
             autowidth: false,
-            rowGroup: {
-                dataSrc: 'category'
-            },
-            orderFixed: [
-                [0, 'asc'],
-            ],
             data: data,
             columns: [
-                { data: 'category', visible: false },
-                { data: 'result', className: "fixedTable", width: '4em' },
-                { data: 'position', className: "fixedTable", width: "1em" },
-                { data: 'behindLeader', className: "fixedTable", width: '4em' },
-                { data: 'behindPrev', className: "fixedTable", width: '4em' },
-                { data: 'boatnumber', className: "fixedTable", width: '2em' },
-                { data: 'p1name', width: "25%" },
-                { data: 'p1addr2', width: "15%" },
-                { data: 'p2name', width: "25%" },
-                { data: 'p2addr2', width: "15%" }
+                { data: 'category', width: '25%' },
+                { data: 'result', className: 'fixedTable', width: '5em' },
+                { data: 'position', className: 'fixedTable', width: '1em' },
+                { data: 'behindLeader', className: 'fixedTable', width: '5em' },
+                { data: 'behindPrev', className: 'fixedTable', width: '5em' },
+                { data: 'boatnumber', className: 'fixedTable', width: '2em' },
+                { data: 'p1name', width: '20%' },
+                { data: 'p1addr2', width: '10%' },
+                { data: 'p2name', width: '20%' },
+                { data: 'p2addr2', width: '10%' }
             ],
-            buttons: [
-                {
+            buttons: [{
                     extend: 'print',
                     orientation: 'landscape',
                 },
@@ -390,7 +398,19 @@ ResultsObj.prototype.showResults = function() {
                 },
                 'csvHtml5'
             ]
-        });
+        };
+
+        if (useCategory) {
+            tableOptions['columns'][0] = { data: 'category', visible: false };
+            tableOptions['rowGroup'] = { dataSrc: 'category' };
+            tableOptions['orderFixed'] = [
+                [0, 'asc'],
+            ];
+        } else {
+            tableOptions['ordering'] = false;
+        }
+
+        that.resultsTable = $('#results-table').DataTable(tableOptions);
         $('#results-tab-button-div').append(that.resultsTable.buttons().container());
         that.resultsTable.on('select', function(e, dt, type, indexes) {
             var rowData = dt.rows(indexes).data().toArray()[0];
@@ -493,7 +513,7 @@ var initDate = new Date(2000, 1, 1);
 initDate.setUTCHours(0);
 initDate.setUTCMinutes(0);
 initDate.setUTCSeconds(0);
-initDate.setUTCMinutes(0)
+initDate.setUTCMinutes(0);
 
 String.prototype.hhmmssToDate = function() {
     var d = new Date(initDate.getTime());
@@ -591,7 +611,7 @@ $('#add_result_clear').on('click', function() { return ro.resetAddResultsForm(''
 $('#boatnumber').on('focusout blur', ro.checkForDuplicates.bind(ro));
 $('input[name="boatclass"]').change(ro.boatClassChanged.bind(ro));
 $('button[name="refresh"]').on('click', ro.refresh.bind(ro));
-
+$('input[name="usecategory"]').change(ro.clickCategory.bind(ro));
 $('#entries-tab').on('show.bs.tab', ro.showEntries.bind(ro));
 $('#entries-tab').on('shown.bs.tab', ro.shownEntries.bind(ro));
 $('#addresult-tab').on('shown.bs.tab', ro.addResultTabFocus.bind(ro));
@@ -602,4 +622,8 @@ $('#results-tab').on('shown.bs.tab', ro.shownResults.bind(ro));
 
 if (window.sessionStorage.getItem('current_tab')) {
     $('#' + window.sessionStorage.getItem('current_tab')).tab('show');
+}
+if (window.sessionStorage.getItem('group_by')) {
+    var buttonNum = window.sessionStorage.getItem('group_by') == 'true' ? 0 : 1;
+    $('input[name="usecategory"]').eq(buttonNum).parent().button('toggle');
 }
