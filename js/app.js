@@ -52,6 +52,7 @@ ResultsObj.prototype.setupSync = function(databasename, remote) {
         .on('change', function(info) {
             that.reporter('on change ' + info);
             if (info.direction == 'pull') {
+                $('.alert.alert-warning').removeClass('invisible');
                 that.reporter('it\'s a pull');
             }
         }).on('error', function(error) {
@@ -352,7 +353,6 @@ ResultsObj.prototype.showResults = function() {
             },
             orderFixed: [
                 [0, 'asc'],
-                // [1, 'asc']
             ],
             data: data,
             columnDefs: [{ visible: false, targets: [0] }],
@@ -568,5 +568,5 @@ $('#entry-tab').on('hide.bs.tab', ro.resetEntryForm.bind(ro));
 $('#results-tab').on('show.bs.tab', ro.showResults.bind(ro));
 
 if (window.sessionStorage.getItem('current_tab')) {
-    $('#'+window.sessionStorage.getItem('current_tab')).tab('show');
+    $('#' + window.sessionStorage.getItem('current_tab')).tab('show');
 }
