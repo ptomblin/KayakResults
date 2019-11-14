@@ -303,44 +303,36 @@ ResultsObj.prototype.shownEntries = function() {
     this.entryTable.columns.adjust().draw();
 };
 
-ResultsObj.prototype.resetPositions = function() {
-    for (var category in boat_classes) {
-        var classes = boat_classes[category];
-        classes.forEach(function(item) {
-            item.bestTime = initDate;
-            item.currentPos = 1;
-        });
-    }
-};
-
 ResultsObj.prototype.clickCategory = function() {
     var useCategory = $('input[name="usecategory"]:checked').val() == 'yes';
     window.sessionStorage.setItem('group_by', useCategory);
-    this.showResults();
+    // don't show the results if the tab isn't visible
+    // - used when setting the use category on a refresh
+    if ($('#results-tab').hasClass('active')) {
+        this.showResults();
+    }
 };
 
 
-ResultsObj.prototype.timeStorage = {};
-
-ResultsObj.prototype.getBestTimes = function(useCategory, doc) {
+ResultsObj.prototype.getBestTimes = function(timeStorage, useCategory, doc) {
     var cat = !useCategory ? 'all' : doc.category;
     // If we're not using category, bestTime and prevTime come from 'all', but currentPos still comes from cat
-    if (!(cat in this.timeStorage)) {
-        this.timeStorage[cat] = {
+    if (!(cat in timeStorage)) {
+        timeStorage[cat] = {
             bestTime: doc.resDate,
             prevTime: doc.resDate,
             currentPos: 1
         };
     }
-    if (!useCategory && !(doc.category in this.timeStorage)) {
-        this.timeStorage[doc.category] = {
+    if (!useCategory && !(doc.category in timeStorage)) {
+        timeStorage[doc.category] = {
             currentPos: 1
         };
     }
-    var prevTime = this.timeStorage[cat]['prevTime'];
-    this.timeStorage[cat]['prevTime'] = doc.resDate;
+    var prevTime = timeStorage[cat]['prevTime'];
+    timeStorage[cat]['prevTime'] = doc.resDate;
 
-    return [this.timeStorage[cat]['bestTime'], prevTime, this.timeStorage[doc.category]['currentPos']++];
+    return [timeStorage[cat]['bestTime'], prevTime, timeStorage[doc.category]['currentPos']++];
 };
 
 
@@ -349,8 +341,7 @@ ResultsObj.prototype.showResults = function() {
     $('.alert.alert-warning').addClass('d-none');
 
     var useCategory = $('input[name="usecategory"]:checked').val() == 'yes';
-    this.resetPositions();
-    this.timeStorage = {};
+    var timeStorage = {};
 
     var that = this;
     this.pdb.allDocs({ 'include_docs': true }).then(function(response) {
@@ -383,7 +374,7 @@ ResultsObj.prototype.showResults = function() {
             return 0;
         }).map(function(doc) {
             if (doc.resDate) {
-                var values = that.getBestTimes(useCategory, doc);
+                var values = that.getBestTimes(timeStorage, useCategory, doc);
                 var bestTime = values[0];
                 var prevTime = values[1];
                 var currentPos = values[2];
@@ -393,10 +384,10 @@ ResultsObj.prototype.showResults = function() {
                 doc.behindLeader = (doc.resDate - bestTime).millisecondsToHHMMSS();
                 doc.behindPrev = (doc.resDate - prevTime).millisecondsToHHMMSS();
             } else {
-                doc.position = 'NF';
+                doc.position = '-';
                 doc.result = 'NF';
-                doc.behindLeader = 'NF';
-                doc.behindPrev = 'NF';
+                doc.behindLeader = '-';
+                doc.behindPrev = '-';
             }
             return doc;
         });
@@ -408,7 +399,7 @@ ResultsObj.prototype.showResults = function() {
             columns: [
                 { data: 'category', width: '25%' },
                 { data: 'result', className: 'fixedTable', width: '5em' },
-                { data: 'position', className: 'fixedTable', width: '1em' },
+                { data: 'position', className: 'fixedTable', width: '2em' },
                 { data: 'behindLeader', className: 'fixedTable', width: '5em' },
                 { data: 'behindPrev', className: 'fixedTable', width: '5em' },
                 { data: 'boatnumber', className: 'fixedTable', width: '2em' },
@@ -649,10 +640,11 @@ $('#entry-tab').on('hide.bs.tab', ro.resetEntryForm.bind(ro));
 $('#results-tab').on('show.bs.tab', ro.showResults.bind(ro));
 $('#results-tab').on('shown.bs.tab', ro.shownResults.bind(ro));
 
-if (window.sessionStorage.getItem('current_tab')) {
-    $('#' + window.sessionStorage.getItem('current_tab')).tab('show');
-}
 if (window.sessionStorage.getItem('group_by')) {
     var buttonNum = window.sessionStorage.getItem('group_by') == 'true' ? 0 : 1;
     $('input[name="usecategory"]').eq(buttonNum).parent().button('toggle');
+}
+
+if (window.sessionStorage.getItem('current_tab')) {
+    $('#' + window.sessionStorage.getItem('current_tab')).tab('show');
 }
