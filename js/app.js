@@ -3,9 +3,8 @@
 function BoatClass(name, hasCrew) {
     this.name = name;
     this.hasCrew = hasCrew;
-    this.bestTime = initDate;
-    this.currentPos = 1;
 }
+
 // This stuff should be in a config file or something:
 var title = 'Saranac Lake 12 Miler';
 var age_categories = ['Under 50', 'Over 50', 'Mixed'];
@@ -117,7 +116,11 @@ ResultsObj.prototype.saveRegistration = function() {
     this.pdb.put(o).then(function(response) {
         that.reporter(response);
         if (response && response.ok) {
-            $('#entries-tab').tab('show');
+            if (that.entryformobj._id.value) {
+                $('#entries-tab').tab('show');
+            } else {
+                that.resetEntryForm();
+            }
         }
     }).catch(function(error) {
         that.reporter('error = ' + error);
@@ -316,18 +319,42 @@ ResultsObj.prototype.clickCategory = function() {
     this.showResults();
 };
 
+
+ResultsObj.prototype.timeStorage = {};
+
+ResultsObj.prototype.getBestTimes = function(useCategory, doc) {
+    var cat = !useCategory ? 'all' : doc.category;
+    // If we're not using category, bestTime and prevTime come from 'all', but currentPos still comes from cat
+    if (!(cat in this.timeStorage)) {
+        this.timeStorage[cat] = {
+            bestTime: doc.resDate,
+            prevTime: doc.resDate,
+            currentPos: 1
+        };
+    }
+    if (!useCategory && !(doc.category in this.timeStorage)) {
+        this.timeStorage[doc.category] = {
+            currentPos: 1
+        };
+    }
+    var prevTime = this.timeStorage[cat]['prevTime'];
+    this.timeStorage[cat]['prevTime'] = doc.resDate;
+
+    return [this.timeStorage[cat]['bestTime'], prevTime, this.timeStorage[doc.category]['currentPos']++];
+};
+
+
 ResultsObj.prototype.showResults = function() {
     'use strict';
     $('.alert.alert-warning').addClass('d-none');
 
     var useCategory = $('input[name="usecategory"]:checked').val() == 'yes';
     this.resetPositions();
+    this.timeStorage = {};
 
     var that = this;
     this.pdb.allDocs({ 'include_docs': true }).then(function(response) {
         that.reporter(response);
-        var bestTime = null;
-        var prevTime = null;
         var data = response.rows.filter(function(val) {
             return Boolean(val.doc.category);
         }).map(function(val) {
@@ -355,17 +382,16 @@ ResultsObj.prototype.showResults = function() {
             }
             return 0;
         }).map(function(doc) {
-            var bi = boat_classes[doc.boatcategory].filter(bi => bi.name == doc.boatclass)[0];
             if (doc.resDate) {
-                doc.position = bi.currentPos++;
-                if (!bestTime || (useCategory && doc.position == 1)) {
-                    bestTime = doc.resDate;
-                    prevTime = doc.resDate;
-                }
+                var values = that.getBestTimes(useCategory, doc);
+                var bestTime = values[0];
+                var prevTime = values[1];
+                var currentPos = values[2];
+
+                doc.position = currentPos;
                 doc.result = (doc.result.hhmmssToDate() - initDate).millisecondsToHHMMSS();
                 doc.behindLeader = (doc.resDate - bestTime).millisecondsToHHMMSS();
                 doc.behindPrev = (doc.resDate - prevTime).millisecondsToHHMMSS();
-                prevTime = doc.resDate;
             } else {
                 doc.position = 'NF';
                 doc.result = 'NF';
