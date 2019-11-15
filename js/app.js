@@ -347,7 +347,7 @@ ResultsObj.prototype.showResults = function () {
       return Boolean(val.doc.category);
     }).map(function (val) {
       if (val.doc.result) {
-        val.doc.resDate = val.doc.result.hhmmssToDate();
+        val.doc.resDate = hhmmssToDate(val.doc.result);
       } else {
         val.doc.resDate = null;
       }
@@ -377,9 +377,9 @@ ResultsObj.prototype.showResults = function () {
         var currentPos = values[2];
 
         doc.position = currentPos;
-        doc.result = (doc.result.hhmmssToDate() - initDate).millisecondsToHHMMSS();
-        doc.behindLeader = (doc.resDate - bestTime).millisecondsToHHMMSS();
-        doc.behindPrev = (doc.resDate - prevTime).millisecondsToHHMMSS();
+        doc.result = millisecondsToHHMMSS(hhmmssToDate(doc.result) - initDate);
+        doc.behindLeader = millisecondsToHHMMSS(doc.resDate - bestTime);
+        doc.behindPrev = millisecondsToHHMMSS(doc.resDate - prevTime);
       } else {
         doc.position = '-';
         doc.result = 'NF';
@@ -532,9 +532,9 @@ initDate.setUTCMinutes(0);
 initDate.setUTCSeconds(0);
 initDate.setUTCMinutes(0);
 
-String.prototype.hhmmssToDate = function () {
+function hhmmssToDate (str) {
   var d = new Date(initDate.getTime());
-  var numbers = this.match(/[\d.]+/g).map(Number);
+  var numbers = str.match(/[\d.]+/g).map(Number);
   d.setUTCSeconds(numbers.pop());
   if (numbers.length > 0) {
     d.setUTCMinutes(numbers.pop());
@@ -543,16 +543,16 @@ String.prototype.hhmmssToDate = function () {
     d.setUTCHours(numbers.pop());
   }
   return d;
-};
+}
 
-Number.prototype.millisecondsToHHMMSS = function () {
-  var seconds = Math.round(this / 1000);
+function millisecondsToHHMMSS (num) {
+  var seconds = Math.round(num / 1000);
   var hours = Math.floor(seconds / (60 * 60));
   var divMins = seconds % (60 * 60);
   var mins = Math.floor(divMins / 60);
   var secs = Math.ceil(divMins % 60);
   return ('00' + hours).slice(-2) + ':' + ('00' + mins).slice(-2) + ':' + ('00' + secs).slice(-2);
-};
+}
 
 function slugify (string) {
   const a = 'àáäâãåăæąçćčđďèéěėëêęğǵḧìíïîįłḿǹńňñòóöôœøṕŕřßşśšșťțùúüûǘůűūųẃẍÿýźžż·/_,:;';
