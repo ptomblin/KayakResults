@@ -631,7 +631,7 @@ if (query.race === 'saranac') {
       data['boat_classes'].forEach(function(bc) {
         var classes = [];
         bc['classes'].forEach(function(cl) {
-          classes.append(new BoatClass(cl['Name'], cl['Crew'] != '1'));
+          classes.push(new BoatClass(cl['Name'], cl['Crew'] != '1'));
         });
         boatClasses[bc['category']] = classes;
       });
