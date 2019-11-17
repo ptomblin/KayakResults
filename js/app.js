@@ -635,7 +635,7 @@ if (query.race === 'saranac') {
         });
         boatClasses[bc['category']] = classes;
       });
-      initialize(title);
+      initialize(query.race);
     });
 }
 
