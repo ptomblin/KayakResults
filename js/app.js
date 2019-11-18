@@ -625,7 +625,7 @@ if (query.race === 'saranac') {
       if (!response.ok) {
         $('#message-area').html('<div class="alert alert-danger">Bad response from server</div>');
         $('body').removeClass('loading').addClass('error');
-        throw new FatalError('Called wrong');
+        throw new FatalError('Bad response');
       }
       return response;
     }).then(function(resp) {
@@ -643,6 +643,10 @@ if (query.race === 'saranac') {
         boatClasses[bc['category']] = classes;
       });
       initialize(query.race);
+    }).catch(function(error) {
+      $('#message-area').html('<div class="alert alert-danger">Bad response from server</div>');
+      $('body').removeClass('loading').addClass('error');
+      throw new FatalError('Other Error ' + error);
     });
 }
 
