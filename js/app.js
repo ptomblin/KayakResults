@@ -627,6 +627,7 @@ if (query.race === 'saranac') {
         $('body').removeClass('loading').addClass('error');
         throw new FatalError('Called wrong');
       }
+      return response;
     }).then(function(resp) {
       return resp.json();
     }).then(function(data) {
