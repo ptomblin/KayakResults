@@ -621,7 +621,13 @@ if (query.race === 'saranac') {
   initialize('kayakresults');
 } else {
   fetch(COUCHURL + CONFIG_DB + query.race)
-    .then(function(resp) {
+    .then(function(response) {
+      if (!response.ok) {
+        $('#message-area').html('<div class="alert alert-danger">Bad response from server</div>');
+        $('body').removeClass('loading').addClass('error');
+        throw new FatalError('Called wrong');
+      }
+    }).then(function(resp) {
       return resp.json();
     }).then(function(data) {
       title = data['race_name'];
