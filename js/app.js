@@ -548,34 +548,35 @@ function initialize (databasename) {
   $('#inner-title').html(htmlEscape(title));
   ageCategories.forEach(function (item, index) {
     var feedback = index === ageCategories.length - 1 ? '<div class="invalid-feedback"><div class="form-check">Please enter an age category</div></div>' : '';
-    $('#age-category').append(`<div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="agecategory" value="${htmlEscape(item)}" required/>
-          <label class="form-check-label">${item}</label>
-          ${feedback}
-          </div>`);
+    $('#age-category').append('<div class="form-check form-check-inline">'+
+          '<input class="form-check-input" type="radio" name="agecategory" value="' + htmlEscape(item) + '" required/>' +
+          '<label class="form-check-label">' + item + '</label>' +
+          feedback +
+          '</div>');
   });
   genderCategories.forEach(function (item, index) {
     var feedback = index === genderCategories.length - 1 ? '<div class="invalid-feedback"><div class="form-check">Please enter an gender category</div></div>' : '';
-    $('#gender-category').append(`<div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="gendercategory" value="${htmlEscape(item)}" required/>
-          <label class="form-check-label">${item}</label>
-          ${feedback}
-          </div>`);
+    $('#gender-category').append('<div class="form-check form-check-inline">'+
+          '<input class="form-check-input" type="radio" name="gendercategory" value="' + htmlEscape(item) + '" required/>' +
+          '<label class="form-check-label">' + item + '</label>' +
+          feedback +
+          '</div>');
   });
   for (var category in boatClasses) {
     var classes = boatClasses[category];
     var inner = '';
     classes.forEach(function (item) {
-      inner = inner.concat(`<div class="form-check offset-sm-1 col-sm-2">
-          <input class="form-check-input" type="radio" name="boatclass" data-category="${category}" data-has-crew="${item.hasCrew}" data-name="${item.name}" value="${htmlEscape(category + '/' + item.name)}" required/>
-          <label class="form-check-label">${item.name}</label>
-        </div>
-          `);
+      inner = inner.concat('<div class="form-check offset-sm-1 col-sm-2">' +
+          '<input class="form-check-input" type="radio" name="boatclass" data-category="' + category + '" data-has-crew="' + item.hasCrew +
+           '" data-name="' + item.name + '" value="' + htmlEscape(category + '/' + item.name) + '" required/>' +
+          '<label class="form-check-label">' + item.name + '</label>' +
+        '</div>'
+         );
     });
-    $('#boat-classes').append(`<div class="form-group row">
-      <div class="offset-sm-1 col-sm-11"><h4>${htmlEscape(category)}</h4></div></div>
-      <div class="form-group row">${inner}</div>
-      `);
+    $('#boat-classes').append('<div class="form-group row">' +
+      '<div class="offset-sm-1 col-sm-11"><h4>' + htmlEscape(category) + '</h4></div></div>' +
+      '<div class="form-group row">' + inner + '</div>'
+      );
   }
 
   var ro = new ResultsObj(databasename, COUCHURL);
