@@ -93,12 +93,13 @@ ResultsObj.prototype.saveRegistration = function () {
   // o.p2age = this.entryformobj.p2age.value;
   // o.p1email = this.entryformobj.p1email.value;
   // o.p2email = this.entryformobj.p2email.value;
-  o.agecategory = this.entryformobj.agecategory.value;
-  o.gendercategory = this.entryformobj.gendercategory.value;
+  // I tried to do this old-school but it doesn't work in IE
+  o.agecategory = $('#age-category [name="agecategory"]:checked').val();
+  o.gendercategory = $('#gender-category [name="gendercategory"]:checked').val();
   // o.awaMember = this.entryformobj.awaMember.value;
   // o.nymcraMember = this.entryformobj.nymcraMember.value;
   o.boatnumber = this.entryformobj.boatnumber.value;
-  var catClass = this.entryformobj.boatclass.value.split('/');
+  var catClass = $('#boat-classes [name="boatclass"]:checked').val().split('/');
   o.boatcategory = catClass.length > 0 ? catClass[0] : '';
   o.boatclass = catClass.length > 0 ? catClass[1] : '';
   o.category = o.boatcategory + ' ' + o.boatclass + ' ' + o.agecategory + ' ' + o.gendercategory;
@@ -570,13 +571,11 @@ function initialize (databasename) {
           '<input class="form-check-input" type="radio" name="boatclass" data-category="' + category + '" data-has-crew="' + item.hasCrew +
            '" data-name="' + item.name + '" value="' + htmlEscape(category + '/' + item.name) + '" required/>' +
           '<label class="form-check-label">' + item.name + '</label>' +
-        '</div>'
-         );
+        '</div>');
     });
     $('#boat-classes').append('<div class="form-group row">' +
       '<div class="offset-sm-1 col-sm-11"><h4>' + htmlEscape(category) + '</h4></div></div>' +
-      '<div class="form-group row">' + inner + '</div>'
-      );
+      '<div class="form-group row">' + inner + '</div>');
   }
 
   var ro = new ResultsObj(databasename, COUCHURL);
