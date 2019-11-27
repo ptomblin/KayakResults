@@ -549,7 +549,7 @@ function initialize (databasename) {
   $('#inner-title').html(htmlEscape(title));
   ageCategories.forEach(function (item, index) {
     var feedback = index === ageCategories.length - 1 ? '<div class="invalid-feedback"><div class="form-check">Please enter an age category</div></div>' : '';
-    $('#age-category').append('<div class="form-check form-check-inline">'+
+    $('#age-category').append('<div class="form-check form-check-inline">' +
           '<input class="form-check-input" type="radio" name="agecategory" value="' + htmlEscape(item) + '" required/>' +
           '<label class="form-check-label">' + item + '</label>' +
           feedback +
@@ -557,7 +557,7 @@ function initialize (databasename) {
   });
   genderCategories.forEach(function (item, index) {
     var feedback = index === genderCategories.length - 1 ? '<div class="invalid-feedback"><div class="form-check">Please enter an gender category</div></div>' : '';
-    $('#gender-category').append('<div class="form-check form-check-inline">'+
+    $('#gender-category').append('<div class="form-check form-check-inline">' +
           '<input class="form-check-input" type="radio" name="gendercategory" value="' + htmlEscape(item) + '" required/>' +
           '<label class="form-check-label">' + item + '</label>' +
           feedback +

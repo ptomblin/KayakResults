@@ -1,6 +1,6 @@
 .fa-minus-circle {
-    color: var(--red);
+    color: darkred;
 }
 .fa-plus-circle {
-    color: var(--blue);
+    color: blue;
 }
