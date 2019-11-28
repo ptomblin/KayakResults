@@ -93,7 +93,7 @@ function cloneTemplate(template, insertionPoint, item) {
   insertionPoint.before(clone);
 }
 
-$('div[name="age-deletion"], div[name="gender-deletion"], div[name="bclass-deletion"], div[name="bcat-deletion"]').on('click', function() {
+$('ul').on('click', 'div[name="age-deletion"], div[name="gender-deletion"], div[name="bclass-deletion"], div[name="bcat-deletion"]', function() {
   var li = $(this).parent();
   li.remove();
 });
