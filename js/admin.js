@@ -112,7 +112,7 @@ $('#age-category-insertion, #gender-category-insertion, li[name="bcat-insertion"
   $('#new-thing').data('type', 'id').data('target', this).data('target-id', li.attr('id')).modal('show');
 });
 
-$('li[name="bclass-insertion"]').on('click', function() {
+$('ul').on('click', 'li[name="bclass-insertion"]', function() {
   var li = $(this);
   var title = li.parents('li').data('category');
   $('#new-class-title').html('New ' + title + ' Class');
@@ -125,12 +125,28 @@ $('li[name="bclass-insertion"]').on('click', function() {
 
 $('#new-thing, #new-class').on('keyup blur', 'input:visible', function() {
   var disableIt = false;
-  $(this).find('input:visible').each(function() {
+  var parent = $(this).parents('.modal-content');
+  parent.find('input:visible').each(function() {
     if ($(this).val() === '') {
       disableIt = true;
     }
   });
-  $(this).find('button.btn-primary').attr('disabled', disableIt);
+  parent.find('button.btn-primary').attr('disabled', disableIt);
+});
+
+$('#new-class-save').on('click', function() {
+  $('#new-class').modal('hide');
+  var $target;
+  if ($('#new-class').data('type') === 'id') {
+    $target = $('#' + $('#new-class').data('target-id'));
+  } else {
+    $target = $($('#new-class').data('target'));
+  }
+  var $innerClone = $target.siblings().first().clone(false).removeClass('d-none').addClass('d-flex').removeAttr('id');
+  var name = $('#new-class-name').val();
+  $innerClone.data('type', 'boat-class').data('class', name).data('has-crew', $('#new-class-hascrew').prop('checked'));
+  $innerClone.children('[name="bclass-inner"]').html(name);
+  $target.before($innerClone);
 });
 
 $('#new-thing-save').on('click', function() {
