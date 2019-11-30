@@ -2,17 +2,19 @@
 /* global CONFIG_DB, COUCHURL, logWarning, logError, hhmmssToDate, millisecondsToHHMMSS, initDate, query, defaultAgeCategories, defaultGenderCategories, defaultBoatClasses */
 /* global FatalError, BoatClass, htmlEscape */
 
-var raceName, raceDate, raceDirector, ageCategories, genderCategories, boatClasses, dbname;
+var raceName, raceDate, raceDirector, ageCategories, genderCategories, boatClasses, dbname, id, rev;
 
 if (query.race === 'saranac') {
   // Default configuration for testing
   raceName = 'Saranac Lake 12 Miler';
   raceDate = '06/06/2020';
-  raceDirector = 'Paul Tomblin'
+  raceDirector = 'Paul Tomblin';
   ageCategories = defaultAgeCategories;
   genderCategories = defaultGenderCategories;
   boatClasses = defaultBoatClasses;
-  dbname = 'kayakresults'
+  dbname = 'kayakresults';
+  id = null;
+  rev = null;
   initialize();
 } else {
   fetch(COUCHURL + CONFIG_DB + query.race)
@@ -30,11 +32,13 @@ if (query.race === 'saranac') {
       raceDate = data.race_date;
       ageCategories = data.age_categories;
       genderCategories = data.gender_categories;
+      id = data._id;
+      rev = data._rev;
       boatClasses = {};
       data.boat_classes.forEach(function(bc) {
         var classes = [];
         bc.classes.forEach(function(cl) {
-          classes.push(new BoatClass(cl.Name, cl.Crew !== '1'));
+          classes.push(new BoatClass(cl.Name, cl.hasCrew));
         });
         boatClasses[bc.category] = classes;
       });
@@ -54,14 +58,14 @@ function initialize() {
 
   var template = $('#age-category-template').clone(false).removeClass('d-none').addClass('d-flex').removeAttr('id');
   var insertionPoint = $('#age-category-insertion');
-  ageCategories.forEach(function(item, index) {
+  ageCategories.forEach(function(item) {
     cloneTemplate(template, insertionPoint, item);
   });
 
   template = $('#gender-category-template').clone(false).removeClass('d-none').addClass('d-flex').removeAttr('id');
   insertionPoint = $('#gender-category-insertion');
 
-  genderCategories.forEach(function(item, index) {
+  genderCategories.forEach(function(item) {
     cloneTemplate(template, insertionPoint, item);
   });
 
@@ -78,12 +82,12 @@ function initialize() {
     var innerInsertion = outerClone.find('[name="bclass-insertion"]');
     classes.forEach(function(item) {
       var innerClone = innerTemplate.clone(false);
-      innerClone.data('type', 'boat-class').data('category', category).data('has-crew', item.hasCrew).data('class', item.name)
+      innerClone.data('type', 'boat-class').data('category', category).data('has-crew', item.hasCrew).data('class', item.name);
       innerClone.children('[name="bclass-inner"]').html(item.name).data('category', category).data('has-crew', item.hasCrew).data('name', item.name);
       innerInsertion.before(innerClone);
     });
     outerInsertion.before(outerClone);
-  };
+  }
 }
 
 function cloneTemplate(template, insertionPoint, item) {
@@ -104,8 +108,6 @@ $('#age-category-insertion, #gender-category-insertion, li[name="bcat-insertion"
   $('#new-thing-title').html('New ' + title + ' Category');
   $('#new-thing-label').html('New ' + title + ' Category Name');
   $('#new-thing-name').val('');
-  $('#new-thing-crewsize-group').addClass('d-none');
-  $('#new-thing-crewsize').val('');
   $('#new-thing-save').attr('disabled', true);
   $('#new-thing').data('type', 'id').data('target', this).data('target-id', li.attr('id')).modal('show');
 });
@@ -113,29 +115,28 @@ $('#age-category-insertion, #gender-category-insertion, li[name="bcat-insertion"
 $('li[name="bclass-insertion"]').on('click', function() {
   var li = $(this);
   var title = li.parents('li').data('category');
-  $('#new-thing-title').html('New ' + title + ' Class');
-  $('#new-thing-label').html('New ' + title + ' Class Name');
-  $('#new-thing-name').val('');
-  $('#new-thing-crewsize-group').removeClass('d-none');
-  $('#new-thing-crewsize').val('');
-  $('#new-thing-save').attr('disabled', true);
-  $('#new-thing').data('type', 'target').data('target', this).data('target-id', li.attr('id')).modal('show');
+  $('#new-class-title').html('New ' + title + ' Class');
+  $('#new-class-label').html('New ' + title + ' Class Name');
+  $('#new-class-name').val('');
+  $('#new-class-hascrew').prop('checked', false);
+  $('#new-class-save').attr('disabled', true);
+  $('#new-class').data('type', 'target').data('target', this).data('target-id', li.attr('id')).modal('show');
 });
 
-$('#new-thing').on('keyup blur', 'input:visible', function() {
+$('#new-thing, #new-class').on('keyup blur', 'input:visible', function() {
   var disableIt = false;
-  $('#new-thing input:visible').each(function() {
+  $(this).find('input:visible').each(function() {
     if ($(this).val() === '') {
       disableIt = true;
     }
   });
-  $('#new-thing-save').attr('disabled', disableIt);
+  $(this).find('button.btn-primary').attr('disabled', disableIt);
 });
 
 $('#new-thing-save').on('click', function() {
   $('#new-thing').modal('hide');
   var $target;
-  if ($('#new-thing').data('type') == 'id') {
+  if ($('#new-thing').data('type') === 'id') {
     $target = $('#' + $('#new-thing').data('target-id'));
   } else {
     $target = $($('#new-thing').data('target'));
@@ -148,4 +149,69 @@ $('#new-thing-save').on('click', function() {
 $('#resetConfig').on('click', function() {
   $('li.list-group-item.d-flex:visible:not([id$=insertion])').remove();
   initialize();
-})
+});
+
+$('#saveConfig').on('click', function() {
+  var config = {
+    race_director: $('#race-director').val(),
+    race_name: $('#race-name').val(),
+    race_date: $('#race-date').val()
+  };
+  if (id !== null) {
+    config._id = id;
+    config._rev = rev;
+  } else {
+    config._id = slugify(config.race_name + config.race_date);
+  }
+  var ages = [];
+  $('#age-category li:visible:not("#age-category-insertion")').each(function() {
+    ages.push($(this).data('category'));
+  });
+  config.age_categories = ages;
+
+  var genders = [];
+  $('#gender-category li:visible:not("#gender-category-insertion")').each(function() {
+    genders.push($(this).data('category'));
+  });
+  config.gender_categories = genders;
+
+  var boatCategories = [];
+  $('#boat-category > li:visible:not([id=bcat-insertion])').each(function() {
+    var boatClasses = [];
+    $(this).find('ul > li:visible:not([name="bclass-insertion"])').each(function() {
+      boatClasses.push({
+        'Name': $(this).data('class'),
+        'hasCrew': $(this).data('hasCrew')
+      });
+    });
+    boatCategories.push({
+      'category': $(this).data('category'),
+      'classes': boatClasses
+    });
+  });
+  config.boat_classes = boatCategories;
+  console.log(JSON.stringify(config));
+
+  if (query.race !== 'saranac') {
+    fetch(COUCHURL + CONFIG_DB + query.race, {
+        method: 'PUT',
+        cache: 'no-cache',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(config)
+      })
+      .then(function(response) {
+        if (!response.ok) {
+          logError('Bad response from server');
+          throw new FatalError('Bad response');
+        }
+        return response;
+      }).then(function(resp) {
+        return resp.json();
+      }).catch(function(error) {
+        logError('Bad response from server: ' + error);
+        throw new FatalError('Other Error ' + error);
+      });
+  }
+});

@@ -87,7 +87,7 @@
             </div>
         </div>
         <div class="row">
-            <ul id="boat-categories" class="list-group offset-sm-2 col-sm-6" data-type="boat-category">
+            <ul id="boat-category" class="list-group offset-sm-2 col-sm-6" data-type="boat-category">
                 <li id="bcat-template" name="bcat-template" class="list-group-item d-none justify-content-between align-items-center">
                     <div name="bcat-inner" class="flex-grow-1">None</div>
                     <div name="bcat-deletion"><i class="fa fa-minus-circle"></i></div>
@@ -126,11 +126,7 @@
                         <div class="container-fluid">
                             <div class="form-group">
                                 <label id="new-thing-name-label" for="new-thing-name"></label>
-                                <input type="text" class="form-control" id="new-thing-name" placeholder="Name"/>
-                            </div>
-                            <div id="new-thing-crewsize-group" class="form-group">
-                                <label for="new-thing-crewsize">Crew Size</label>
-                                <input type="text" class="form-control" id="new-thing-crewsize" placeholder="Num crew"/>
+                                <input type="text" class="form-control" id="new-thing-name" placeholder="Name" />
                             </div>
                         </div>
                     </div>
@@ -140,7 +136,32 @@
                     </div>
                 </div>
             </div>
-
+        </div>
+        <div class="modal fade" id="new-class" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 id="new-class-title" class="modal-title">Boat Class</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="form-group">
+                                <label id="new-class-name-label" for="new-class-name"></label>
+                                <input type="text" class="form-control" id="new-class-name" placeholder="Name" />
+                            </div>
+                            <div id="new-class-hascrew-group" class="form-check">
+                                <input type="checkbox" class="form-check-input" id="new-class-hascrew" value="true" />
+                                <label for="new-class-hascrew" class="form-check-label">Does this boat have a crew?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="new-class-save" type="button" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="ajax-spinner"></div>

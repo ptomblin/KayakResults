@@ -3,7 +3,7 @@
 var COUCHURL = 'http://127.0.0.1:5984';
 var CONFIG_DB = '/config-db/';
 
-function getQueryParams (qs) {
+function getQueryParams(qs) {
   qs = qs.split('+').join(' ');
 
   var params = {};
@@ -17,17 +17,18 @@ function getQueryParams (qs) {
   return params;
 }
 
-function FatalError () {
+function FatalError() {
   Error.apply(this, arguments);
   this.name = 'FatalError';
 }
 FatalError.prototype = Object.create(Error.prototype);
 
-function logError (error) {
+function logError(error) {
   $('#message-area').html('<div class="alert alert-danger">' + error + '</div>');
   $('body').removeClass('loading').addClass('error');
 }
-function logWarning (warning) {
+
+function logWarning(warning) {
   $('#message-area').html('<div class="alert alert-warning">' + warning + '</div>');
   $('body').removeClass('loading').addClass('warning');
 }
@@ -38,7 +39,7 @@ if (!query.race) {
   throw new FatalError('Called wrong');
 }
 
-function BoatClass (name, hasCrew) {
+function BoatClass(name, hasCrew) {
   this.name = name;
   this.hasCrew = hasCrew;
 }
@@ -49,7 +50,7 @@ initDate.setUTCMinutes(0);
 initDate.setUTCSeconds(0);
 initDate.setUTCMinutes(0);
 
-function hhmmssToDate (str) {
+function hhmmssToDate(str) {
   var d = new Date(initDate.getTime());
   var numbers = str.match(/[\d.]+/g).map(Number);
   d.setUTCSeconds(numbers.pop());
@@ -62,7 +63,7 @@ function hhmmssToDate (str) {
   return d;
 }
 
-function millisecondsToHHMMSS (num) {
+function millisecondsToHHMMSS(num) {
   var seconds = Math.round(num / 1000);
   var hours = Math.floor(seconds / (60 * 60));
   var divMins = seconds % (60 * 60);
@@ -71,14 +72,14 @@ function millisecondsToHHMMSS (num) {
   return ('00' + hours).slice(-2) + ':' + ('00' + mins).slice(-2) + ':' + ('00' + secs).slice(-2);
 }
 
-function slugify (string) {
+function slugify(string) {
   const a = 'àáäâãåăæąçćčđďèéěėëêęğǵḧìíïîįłḿǹńňñòóöôœøṕŕřßşśšșťțùúüûǘůűūųẃẍÿýźžż·/_,:;';
   const b = 'aaaaaaaaacccddeeeeeeegghiiiiilmnnnnooooooprrsssssttuuuuuuuuuwxyyzzz------';
   const p = new RegExp(a.split('').join('|'), 'g');
 
   return string.toString().toLowerCase()
     .replace(/\s+/g, '-') // Replace spaces with -
-    .replace(p, function (c) { return b.charAt(a.indexOf(c)); }) // Replace special characters
+    .replace(p, function(c) { return b.charAt(a.indexOf(c)); }) // Replace special characters
     .replace(/&/g, '-and-') // Replace & with 'and'
     .replace(/[^\w-]+/g, '') // Remove all non-word characters
     .replace(/--+/g, '-') // Replace multiple - with single -
@@ -86,7 +87,7 @@ function slugify (string) {
     .replace(/-+$/, ''); // Trim - from end of text
 }
 
-function htmlEscape (str) {
+function htmlEscape(str) {
   return str
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
@@ -95,7 +96,7 @@ function htmlEscape (str) {
     .replace(/>/g, '&gt;');
 }
 
-function htmlUnescape (str) {
+function htmlUnescape(str) {
   return str
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, '\'')

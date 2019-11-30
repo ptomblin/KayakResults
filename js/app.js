@@ -5,7 +5,7 @@
 
 var title, ageCategories, genderCategories, boatClasses;
 
-var ResultsObj = function (databasename, remoteorigin) {
+var ResultsObj = function(databasename, remoteorigin) {
   'use strict';
 
   Object.defineProperty(this, 'pdb', { writable: true });
@@ -23,9 +23,9 @@ var ResultsObj = function (databasename, remoteorigin) {
     index: {
       fields: ['boatnumber']
     }
-  }).then(function (result) {
+  }).then(function(result) {
     that.reporter(result);
-  }).catch(function (err) {
+  }).catch(function(err) {
     that.reporter('err = ' + err);
   });
   // this.pdb.on('error', function(err) {}); DO SOMETHING
@@ -35,17 +35,17 @@ var ResultsObj = function (databasename, remoteorigin) {
   }
 };
 
-ResultsObj.prototype.setupSync = function (databasename, remote) {
+ResultsObj.prototype.setupSync = function(databasename, remote) {
   var that = this;
   this.sync = PouchDB.sync(databasename, remote, { live: true, retry: true })
-    .on('change', function (info) {
+    .on('change', function(info) {
       that.reporter('on change ' + info);
       if (info.direction === 'pull') {
         $('.alert.alert-warning').removeClass('d-none');
         logWarning('');
         that.reporter('it\'s a pull');
       }
-    }).on('error', function (error) {
+    }).on('error', function(error) {
       logWarning('Unable to sync with remote db');
       that.reporter('sync error ' + error);
     });
@@ -56,7 +56,7 @@ Create a function to log errors to the console for
 development.
 */
 
-ResultsObj.prototype.reporter = function (error, response) {
+ResultsObj.prototype.reporter = function(error, response) {
   'use strict';
   if (console !== undefined) {
     if (error) { console.log(error); }
@@ -64,7 +64,7 @@ ResultsObj.prototype.reporter = function (error, response) {
   }
 };
 
-ResultsObj.prototype.saveRegistration = function () {
+ResultsObj.prototype.saveRegistration = function() {
   'use strict';
   var o = {};
   var that = this;
@@ -104,7 +104,7 @@ ResultsObj.prototype.saveRegistration = function () {
   o.boatclass = catClass.length > 0 ? catClass[1] : '';
   o.category = o.boatcategory + ' ' + o.boatclass + ' ' + o.agecategory + ' ' + o.gendercategory;
   o.modified = new Date().getTime();
-  this.pdb.put(o).then(function (response) {
+  this.pdb.put(o).then(function(response) {
     that.reporter(response);
     if (response && response.ok) {
       if (that.entryformobj._id.value) {
@@ -113,21 +113,21 @@ ResultsObj.prototype.saveRegistration = function () {
         that.resetEntryForm();
       }
     }
-  }).catch(function (error) {
+  }).catch(function(error) {
     that.reporter('error = ' + error);
     // do something
   });
 };
 
-ResultsObj.prototype.deleteEntry = function () {
+ResultsObj.prototype.deleteEntry = function() {
   var that = this;
   var _id = that.entryformobj._id.value;
   var _rev = that.entryformobj._rev.value;
-  that.pdb.remove(_id, _rev).then(function (response) {
+  that.pdb.remove(_id, _rev).then(function(response) {
     if (response.ok) {
       $('#entries-tab').tab('show');
     }
-  }).catch(function (error) {
+  }).catch(function(error) {
     that.reporter(error);
     if (error) {
       // Do something
@@ -135,10 +135,10 @@ ResultsObj.prototype.deleteEntry = function () {
   });
 };
 
-ResultsObj.prototype.editEntry = function (rowData) {
+ResultsObj.prototype.editEntry = function(rowData) {
   this.entryformobj.boatnumber.value = rowData.boatnumber;
   this.entryformobj.boatclass.value = rowData.boatcategory + '/' + rowData.boatclass;
-  var bc = boatClasses[rowData.boatcategory].filter(function (b) { return b.name === rowData.boatclass; })[0];
+  var bc = boatClasses[rowData.boatcategory].filter(function(b) { return b.name === rowData.boatclass; })[0];
   this.setCrewFields(bc.hasCrew);
   this.entryformobj._id.value = rowData._id;
   this.entryformobj._rev.value = rowData._rev;
@@ -161,20 +161,20 @@ ResultsObj.prototype.editEntry = function (rowData) {
   $('#entry-tab').tab('show');
 };
 
-ResultsObj.prototype.resetEntryForm = function () {
+ResultsObj.prototype.resetEntryForm = function() {
   this.entryformobj.reset();
   this.entryformobj._id.value = '';
   this.entryformobj._rev.value = '';
   this.setCrewFields(true);
 };
 
-ResultsObj.prototype.showEntry = function () {
+ResultsObj.prototype.showEntry = function() {
   var that = this;
   var boatNumber = $('#add_result_boat_number').val();
   that.pdb.find({
     selector: { boatnumber: boatNumber },
     fields: ['_id', 'p1name', 'p2name', 'boatcategory', 'boatclass', 'result']
-  }).then(function (response) {
+  }).then(function(response) {
     that.reporter(response);
     if (response.docs.length <= 0) {
       that.resetAddResultsForm(boatNumber);
@@ -183,12 +183,12 @@ ResultsObj.prototype.showEntry = function () {
     }
     $('#add_result_submit').attr('disabled', false);
     that.updateResultBoatInfo(response.docs[0]);
-  }).catch(function (error) {
+  }).catch(function(error) {
     that.reporter(error);
   });
 };
 
-ResultsObj.prototype.updateResultBoatInfo = function (record) {
+ResultsObj.prototype.updateResultBoatInfo = function(record) {
   $('#add_result_boat_number').removeClass('is-invalid');
   $('#add_result_category').addClass('readonly-highlight').val(record.boatcategory);
   $('#add_result_class').addClass('readonly-highlight').val(record.boatclass);
@@ -203,7 +203,7 @@ ResultsObj.prototype.updateResultBoatInfo = function (record) {
   $('#add_result_result').focus().select();
 };
 
-ResultsObj.prototype.resetAddResultsForm = function (boatNumber) {
+ResultsObj.prototype.resetAddResultsForm = function(boatNumber) {
   $('#add_result_submit').attr('disabled', true);
   $('#add_result_boat_number').removeClass('is-invalid').focus().select().val(boatNumber);
   $('#add_result_result').val('');
@@ -214,38 +214,38 @@ ResultsObj.prototype.resetAddResultsForm = function (boatNumber) {
   $('#add_result_id').val('');
 };
 
-ResultsObj.prototype.editResult = function (rowData) {
+ResultsObj.prototype.editResult = function(rowData) {
   $('#add_result_submit').attr('disabled', false);
   $('#add_result_boat_number').val(rowData.boatnumber);
   $('#add_result_result').val(rowData.result);
   this.updateResultBoatInfo(rowData);
 };
 
-ResultsObj.prototype.saveResult = function () {
+ResultsObj.prototype.saveResult = function() {
   var that = this;
-  that.pdb.get($('#add_result_id').val()).then(function (doc) {
+  that.pdb.get($('#add_result_id').val()).then(function(doc) {
     doc.result = $('#add_result_result').val();
     return that.pdb.put(doc);
-  }).then(function (response) {
+  }).then(function(response) {
     that.reporter(response);
     if (response && response.ok) {
       that.resetAddResultsForm('');
     }
-  }).catch(function (error) {
+  }).catch(function(error) {
     that.reporter('error = ' + error);
     // do something
   });
 };
 
-ResultsObj.prototype.showEntries = function () {
+ResultsObj.prototype.showEntries = function() {
   'use strict';
   $('.alert.alert-warning').addClass('d-none');
   var that = this;
-  this.pdb.allDocs({ include_docs: true }).then(function (response) {
+  this.pdb.allDocs({ include_docs: true }).then(function(response) {
     that.reporter(response);
-    var data = response.rows.filter(function (val) {
+    var data = response.rows.filter(function(val) {
       return Boolean(val.doc.category);
-    }).map(function (val) {
+    }).map(function(val) {
       return val.doc;
     });
     that.entryTable = $('#entries-table').DataTable({
@@ -269,32 +269,32 @@ ResultsObj.prototype.showEntries = function () {
       searching: false,
       lengthChange: true,
       buttons: [{
-        extend: 'print',
-        orientation: 'landscape'
-      },
-      {
-        extend: 'pdfHtml5',
-        orientation: 'landscape'
-      },
-      'csvHtml5'
+          extend: 'print',
+          orientation: 'landscape'
+        },
+        {
+          extend: 'pdfHtml5',
+          orientation: 'landscape'
+        },
+        'csvHtml5'
       ]
     });
-    that.entryTable.on('select', function (e, dt, type, indexes) {
+    that.entryTable.on('select', function(e, dt, type, indexes) {
       var rowData = dt.rows(indexes).data().toArray()[0];
       that.editEntry(rowData);
     });
     $('#entries-tab-button-div').append(that.entryTable.buttons().container());
-  }).catch(function (error) {
+  }).catch(function(error) {
     that.reporter(error);
     // do something
   });
 };
 
-ResultsObj.prototype.shownEntries = function () {
+ResultsObj.prototype.shownEntries = function() {
   this.entryTable.columns.adjust().draw();
 };
 
-ResultsObj.prototype.clickCategory = function () {
+ResultsObj.prototype.clickCategory = function() {
   var useCategory = $('input[name="usecategory"]:checked').val() === 'yes';
   window.sessionStorage.setItem('group_by', useCategory);
   // don't show the results if the tab isn't visible
@@ -304,7 +304,7 @@ ResultsObj.prototype.clickCategory = function () {
   }
 };
 
-ResultsObj.prototype.getBestTimes = function (timeStorage, useCategory, doc) {
+ResultsObj.prototype.getBestTimes = function(timeStorage, useCategory, doc) {
   var cat = !useCategory ? 'all' : doc.category;
   // If we're not using category, bestTime and prevTime come from 'all', but currentPos still comes from cat
   if (!(cat in timeStorage)) {
@@ -325,7 +325,7 @@ ResultsObj.prototype.getBestTimes = function (timeStorage, useCategory, doc) {
   return [timeStorage[cat].bestTime, prevTime, timeStorage[doc.category].currentPos++];
 };
 
-ResultsObj.prototype.showResults = function () {
+ResultsObj.prototype.showResults = function() {
   'use strict';
   $('.alert.alert-warning').addClass('d-none');
 
@@ -333,18 +333,18 @@ ResultsObj.prototype.showResults = function () {
   var timeStorage = {};
 
   var that = this;
-  this.pdb.allDocs({ include_docs: true }).then(function (response) {
+  this.pdb.allDocs({ include_docs: true }).then(function(response) {
     that.reporter(response);
-    var data = response.rows.filter(function (val) {
+    var data = response.rows.filter(function(val) {
       return Boolean(val.doc.category);
-    }).map(function (val) {
+    }).map(function(val) {
       if (val.doc.result) {
         val.doc.resDate = hhmmssToDate(val.doc.result);
       } else {
         val.doc.resDate = null;
       }
       return val.doc;
-    }).sort(function (a, b) {
+    }).sort(function(a, b) {
       if (useCategory && a.category < b.category) {
         return -1;
       }
@@ -361,7 +361,7 @@ ResultsObj.prototype.showResults = function () {
         return 1;
       }
       return 0;
-    }).map(function (doc) {
+    }).map(function(doc) {
       if (doc.resDate) {
         var values = that.getBestTimes(timeStorage, useCategory, doc);
         var bestTime = values[0];
@@ -398,14 +398,14 @@ ResultsObj.prototype.showResults = function () {
         { data: 'p2addr2', width: '10%' }
       ],
       buttons: [{
-        extend: 'print',
-        orientation: 'landscape'
-      },
-      {
-        extend: 'pdfHtml5',
-        orientation: 'landscape'
-      },
-      'csvHtml5'
+          extend: 'print',
+          orientation: 'landscape'
+        },
+        {
+          extend: 'pdfHtml5',
+          orientation: 'landscape'
+        },
+        'csvHtml5'
       ]
     };
 
@@ -421,22 +421,22 @@ ResultsObj.prototype.showResults = function () {
 
     that.resultsTable = $('#results-table').DataTable(tableOptions);
     $('#results-tab-button-div').append(that.resultsTable.buttons().container());
-    that.resultsTable.on('select', function (e, dt, type, indexes) {
+    that.resultsTable.on('select', function(e, dt, type, indexes) {
       var rowData = dt.rows(indexes).data().toArray()[0];
       that.editResult(rowData);
       $('#addresult-tab').tab('show');
     });
-  }).catch(function (error) {
+  }).catch(function(error) {
     that.reporter(error);
     // do something
   });
 };
 
-ResultsObj.prototype.shownResults = function () {
+ResultsObj.prototype.shownResults = function() {
   this.resultsTable.columns.adjust().draw();
 };
 
-ResultsObj.prototype.checkForDuplicates = function (callback) {
+ResultsObj.prototype.checkForDuplicates = function(callback) {
   // If there is another entry with the same boat number and different _id, then
   // validation fails and so we don't save.
   var that = this;
@@ -446,26 +446,26 @@ ResultsObj.prototype.checkForDuplicates = function (callback) {
   that.pdb.find({
     selector: { boatnumber: boatNumber },
     fields: ['_id']
-  }).then(function (response) {
+  }).then(function(response) {
     that.reporter(response);
     if (response.docs.length > 0) {
-      if (response.docs.some(function (val) { return val._id !== id; })) {
+      if (response.docs.some(function(val) { return val._id !== id; })) {
         $('#boatnumber').addClass('is-invalid');
         return;
       }
     }
     $('#boatnumber').removeClass('is-invalid');
     callback instanceof Function && callback();
-  }).catch(function (error) {
+  }).catch(function(error) {
     that.reporter(error);
   });
 };
 
-ResultsObj.prototype.boatClassChanged = function (event) {
+ResultsObj.prototype.boatClassChanged = function(event) {
   this.setCrewFields(event.target.dataset.hasCrew === 'true');
 };
 
-ResultsObj.prototype.setCrewFields = function (hasCrew) {
+ResultsObj.prototype.setCrewFields = function(hasCrew) {
   if (hasCrew) {
     this.entryformobj.p2name.removeAttribute('disabled');
     this.entryformobj.p2name.setAttribute('required', 'required');
@@ -485,7 +485,7 @@ ResultsObj.prototype.setCrewFields = function (hasCrew) {
   }
 };
 
-ResultsObj.prototype.addResultTabFocus = function () {
+ResultsObj.prototype.addResultTabFocus = function() {
   if ($('#add_result_boat_number').val() === '') {
     $('#add_result_boat_number').focus().select();
   } else {
@@ -493,7 +493,7 @@ ResultsObj.prototype.addResultTabFocus = function () {
   }
 };
 
-ResultsObj.prototype.refresh = function () {
+ResultsObj.prototype.refresh = function() {
   if ($('#entries-tab').hasClass('active')) {
     this.showEntries();
   }
@@ -502,7 +502,7 @@ ResultsObj.prototype.refresh = function () {
   }
 };
 
-function recordSelectedTab (e) {
+function recordSelectedTab(e) {
   window.sessionStorage.setItem('current_tab', e.target.attributes.id.value);
 }
 
@@ -517,60 +517,60 @@ if (query.race === 'saranac') {
   initialize('kayakresults');
 } else {
   fetch(COUCHURL + CONFIG_DB + query.race)
-    .then(function (response) {
+    .then(function(response) {
       if (!response.ok) {
         logError('Bad response from server');
         throw new FatalError('Bad response');
       }
       return response;
-    }).then(function (resp) {
+    }).then(function(resp) {
       return resp.json();
-    }).then(function (data) {
+    }).then(function(data) {
       title = data.race_name;
       ageCategories = data.age_categories;
       genderCategories = data.gender_categories;
       boatClasses = {};
-      data.boat_classes.forEach(function (bc) {
+      data.boat_classes.forEach(function(bc) {
         var classes = [];
-        bc.classes.forEach(function (cl) {
-          classes.push(new BoatClass(cl.Name, cl.Crew !== '1'));
+        bc.classes.forEach(function(cl) {
+          classes.push(new BoatClass(cl.Name, cl.hasCrew));
         });
         boatClasses[bc.category] = classes;
       });
       initialize(query.race);
-    }).catch(function (error) {
+    }).catch(function(error) {
       logError('Bad response from server: ' + error);
       throw new FatalError('Other Error ' + error);
     });
 }
 
-function initialize (databasename) {
+function initialize(databasename) {
   document.title = title;
   $('#inner-title').html(htmlEscape(title));
-  ageCategories.forEach(function (item, index) {
+  ageCategories.forEach(function(item, index) {
     var feedback = index === ageCategories.length - 1 ? '<div class="invalid-feedback"><div class="form-check">Please enter an age category</div></div>' : '';
     $('#age-category').append('<div class="form-check form-check-inline">' +
-          '<input class="form-check-input" type="radio" name="agecategory" value="' + htmlEscape(item) + '" required/>' +
-          '<label class="form-check-label">' + item + '</label>' +
-          feedback +
-          '</div>');
+      '<input class="form-check-input" type="radio" name="agecategory" value="' + htmlEscape(item) + '" required/>' +
+      '<label class="form-check-label">' + item + '</label>' +
+      feedback +
+      '</div>');
   });
-  genderCategories.forEach(function (item, index) {
+  genderCategories.forEach(function(item, index) {
     var feedback = index === genderCategories.length - 1 ? '<div class="invalid-feedback"><div class="form-check">Please enter an gender category</div></div>' : '';
     $('#gender-category').append('<div class="form-check form-check-inline">' +
-          '<input class="form-check-input" type="radio" name="gendercategory" value="' + htmlEscape(item) + '" required/>' +
-          '<label class="form-check-label">' + item + '</label>' +
-          feedback +
-          '</div>');
+      '<input class="form-check-input" type="radio" name="gendercategory" value="' + htmlEscape(item) + '" required/>' +
+      '<label class="form-check-label">' + item + '</label>' +
+      feedback +
+      '</div>');
   });
   for (var category in boatClasses) {
     var classes = boatClasses[category];
     var inner = '';
-    classes.forEach(function (item) {
+    classes.forEach(function(item) {
       inner = inner.concat('<div class="form-check offset-sm-1 col-sm-2">' +
-          '<input class="form-check-input" type="radio" name="boatclass" data-category="' + category + '" data-has-crew="' + item.hasCrew +
-           '" data-name="' + item.name + '" value="' + htmlEscape(category + '/' + item.name) + '" required/>' +
-          '<label class="form-check-label">' + item.name + '</label>' +
+        '<input class="form-check-input" type="radio" name="boatclass" data-category="' + category + '" data-has-crew="' + item.hasCrew +
+        '" data-name="' + item.name + '" value="' + htmlEscape(category + '/' + item.name) + '" required/>' +
+        '<label class="form-check-label">' + item.name + '</label>' +
         '</div>');
     });
     $('#boat-classes').append('<div class="form-group row">' +
@@ -584,7 +584,7 @@ function initialize (databasename) {
   ro.entriesobj = document.getElementById('entries-table');
   ro.addresultobj = document.getElementById('add_result');
 
-  ro.entryformobj.addEventListener('submit', function (e) {
+  ro.entryformobj.addEventListener('submit', function(e) {
     e.preventDefault();
     e.stopPropagation();
     ro.entryformobj.classList.add('was-validated');
@@ -598,7 +598,7 @@ function initialize (databasename) {
   $('#clearEntry').on('click', ro.resetEntryForm.bind(ro));
   $('#add_result_boat_number').on('focusout blur', ro.showEntry.bind(ro));
   $('#add_result_submit').on('click', ro.saveResult.bind(ro));
-  $('#add_result_clear').on('click', function () { return ro.resetAddResultsForm(''); });
+  $('#add_result_clear').on('click', function() { return ro.resetAddResultsForm(''); });
   $('#boatnumber').on('focusout blur', ro.checkForDuplicates.bind(ro));
   $('input[name="boatclass"]').change(ro.boatClassChanged.bind(ro));
   $('button[name="refresh"]').on('click', ro.refresh.bind(ro));
@@ -606,7 +606,7 @@ function initialize (databasename) {
   $('#entries-tab').on('show.bs.tab', ro.showEntries.bind(ro));
   $('#entries-tab').on('shown.bs.tab', ro.shownEntries.bind(ro));
   $('#addresult-tab').on('shown.bs.tab', ro.addResultTabFocus.bind(ro));
-  $('#addresult-tab').on('hide.bs.tab', function () { return ro.resetAddResultsForm(''); });
+  $('#addresult-tab').on('hide.bs.tab', function() { return ro.resetAddResultsForm(''); });
   $('#entry-tab').on('hide.bs.tab', ro.resetEntryForm.bind(ro));
   $('#results-tab').on('show.bs.tab', ro.showResults.bind(ro));
   $('#results-tab').on('shown.bs.tab', ro.shownResults.bind(ro));
