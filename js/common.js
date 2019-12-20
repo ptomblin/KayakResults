@@ -2,8 +2,10 @@
 
 var COUCHURL = 'http://127.0.0.1:5984';
 var CONFIG_DB = '/config-db/';
+var POUCH_RACE_DB = 'kayakresults_racedb';
+var POUCH_CONFIG_DB = 'kayakresults_localconfig';
 
-function getQueryParams(qs) {
+function getQueryParams (qs) {
   qs = qs.split('+').join(' ');
 
   var params = {};
@@ -17,29 +19,23 @@ function getQueryParams(qs) {
   return params;
 }
 
-function FatalError() {
+function FatalError () {
   Error.apply(this, arguments);
   this.name = 'FatalError';
 }
 FatalError.prototype = Object.create(Error.prototype);
 
-function logError(error) {
+function logError (error) {
   $('#message-area').html('<div class="alert alert-danger">' + error + '</div>');
   $('body').removeClass('loading').addClass('error');
 }
 
-function logWarning(warning) {
+function logWarning (warning) {
   $('#message-area').html('<div class="alert alert-warning">' + warning + '</div>');
   $('body').removeClass('loading').addClass('warning');
 }
 
-var query = getQueryParams(document.location.search);
-if (!query.race) {
-  logError('Race name not set');
-  throw new FatalError('Called wrong');
-}
-
-function BoatClass(name, hasCrew) {
+function BoatClass (name, hasCrew) {
   this.name = name;
   this.hasCrew = hasCrew;
 }
@@ -50,7 +46,7 @@ initDate.setUTCMinutes(0);
 initDate.setUTCSeconds(0);
 initDate.setUTCMinutes(0);
 
-function hhmmssToDate(str) {
+function hhmmssToDate (str) {
   var d = new Date(initDate.getTime());
   var numbers = str.match(/[\d.]+/g).map(Number);
   d.setUTCSeconds(numbers.pop());
@@ -63,7 +59,7 @@ function hhmmssToDate(str) {
   return d;
 }
 
-function millisecondsToHHMMSS(num) {
+function millisecondsToHHMMSS (num) {
   var seconds = Math.round(num / 1000);
   var hours = Math.floor(seconds / (60 * 60));
   var divMins = seconds % (60 * 60);
@@ -72,14 +68,14 @@ function millisecondsToHHMMSS(num) {
   return ('00' + hours).slice(-2) + ':' + ('00' + mins).slice(-2) + ':' + ('00' + secs).slice(-2);
 }
 
-function slugify(string) {
+function slugify (string) {
   const a = 'àáäâãåăæąçćčđďèéěėëêęğǵḧìíïîįłḿǹńňñòóöôœøṕŕřßşśšșťțùúüûǘůűūųẃẍÿýźžż·/_,:;';
   const b = 'aaaaaaaaacccddeeeeeeegghiiiiilmnnnnooooooprrsssssttuuuuuuuuuwxyyzzz------';
   const p = new RegExp(a.split('').join('|'), 'g');
 
   return string.toString().toLowerCase()
     .replace(/\s+/g, '-') // Replace spaces with -
-    .replace(p, function(c) { return b.charAt(a.indexOf(c)); }) // Replace special characters
+    .replace(p, function (c) { return b.charAt(a.indexOf(c)); }) // Replace special characters
     .replace(/&/g, '-and-') // Replace & with 'and'
     .replace(/[^\w-]+/g, '') // Remove all non-word characters
     .replace(/--+/g, '-') // Replace multiple - with single -
@@ -87,7 +83,7 @@ function slugify(string) {
     .replace(/-+$/, ''); // Trim - from end of text
 }
 
-function htmlEscape(str) {
+function htmlEscape (str) {
   return str
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
@@ -96,7 +92,7 @@ function htmlEscape(str) {
     .replace(/>/g, '&gt;');
 }
 
-function htmlUnescape(str) {
+function htmlUnescape (str) {
   return str
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, '\'')
@@ -105,11 +101,106 @@ function htmlUnescape(str) {
     .replace(/&amp;/g, '&');
 }
 
-var defaultAgeCategories = ['Under 50', 'Over 50', 'Mixed'];
-var defaultGenderCategories = ['Male', 'Female', 'Mixed'];
-var defaultBoatClasses = {
-  Guideboat: [new BoatClass('1 Person', false), new BoatClass('2 Person', true), new BoatClass('Open Touring', false)],
-  Kayak: [new BoatClass('Recreational', false), new BoatClass('K-1 Touring', false), new BoatClass('K-1 Unlimited', false), new BoatClass('2 Person Kayak', true)],
-  Canoe: [new BoatClass('Solo Recreational', false), new BoatClass('C-1 Stock', false), new BoatClass('C-2 Stock', true), new BoatClass('C-2 Amateur', true), new BoatClass('C-4 Stock', true), new BoatClass('Voyageur', true)],
-  SUP: [new BoatClass('12\'6" Class', false), new BoatClass('14\' Class', false)]
+var defaultRaceConfig = {
+  _id: 'config',
+  race_director: 'Paul Tomblin',
+  race_director_id: 'ptomblin',
+  race_name: 'Round The Mountain 2020',
+  race_date: '2020/04/20',
+  age_categories: [
+    'Under 50',
+    'Over 50',
+    'Mixed'
+  ],
+  gender_categories: [
+    'Male',
+    'Female',
+    'Mixed'
+  ],
+  boat_classes: [
+    {
+      category: 'Guideboat',
+      classes: [
+        {
+          Name: '1 Person',
+          hasCrew: false
+        },
+        {
+          Name: '2 Person',
+          hasCrew: true
+        },
+        {
+          Name: 'Open Touring',
+          hasCrew: false
+        }
+      ]
+    },
+    {
+      category: 'Kayak',
+      classes: [
+        {
+          Name: 'Recreational',
+          hasCrew: false
+        },
+        {
+          Name: 'K-1 Touring',
+          hasCrew: false
+        },
+        {
+          Name: 'K-1 Unlimited',
+          hasCrew: false
+        },
+        {
+          Name: 'K-2 Double Kayak',
+          hasCrew: true
+        }
+      ]
+    },
+    {
+      category: 'Canoe',
+      classes: [
+        {
+          Name: 'Solo Recreational',
+          hasCrew: false
+        },
+        {
+          Name: 'Double Recreational',
+          hasCrew: true
+        },
+        {
+          Name: 'C-1 Stock',
+          hasCrew: false
+        },
+        {
+          Name: 'C-2 Stock',
+          hasCrew: true
+        },
+        {
+          Name: 'C-2 Amateur',
+          hasCrew: true
+        },
+        {
+          Name: 'C-4 Stock',
+          hasCrew: true
+        },
+        {
+          Name: 'Voyageur',
+          hasCrew: true
+        }
+      ]
+    },
+    {
+      category: 'SUP',
+      classes: [
+        {
+          Name: '12\' 6" Class',
+          hasCrew: false
+        },
+        {
+          Name: '14\' Class',
+          hasCrew: false
+        }
+      ]
+    }
+  ]
 };

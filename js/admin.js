@@ -1,6 +1,6 @@
 /* global $, PouchDB, fetch */
 /* global CONFIG_DB, COUCHURL, logWarning, logError, hhmmssToDate, millisecondsToHHMMSS, initDate, query, defaultAgeCategories, defaultGenderCategories, defaultBoatClasses */
-/* global FatalError, BoatClass, htmlEscape */
+/* global FatalError, BoatClass, htmlEscape, slugify */
 
 var raceName, raceDate, raceDirector, ageCategories, genderCategories, boatClasses, dbname, id, rev;
 
@@ -18,15 +18,15 @@ if (query.race === 'saranac') {
   initialize();
 } else {
   fetch(COUCHURL + CONFIG_DB + query.race)
-    .then(function(response) {
+    .then(function (response) {
       if (!response.ok) {
         logError('Bad response from server');
         throw new FatalError('Bad response');
       }
       return response;
-    }).then(function(resp) {
+    }).then(function (resp) {
       return resp.json();
-    }).then(function(data) {
+    }).then(function (data) {
       raceName = data.race_name;
       raceDirector = data.race_director;
       raceDate = data.race_date;
@@ -35,22 +35,22 @@ if (query.race === 'saranac') {
       id = data._id;
       rev = data._rev;
       boatClasses = {};
-      data.boat_classes.forEach(function(bc) {
+      data.boat_classes.forEach(function (bc) {
         var classes = [];
-        bc.classes.forEach(function(cl) {
+        bc.classes.forEach(function (cl) {
           classes.push(new BoatClass(cl.Name, cl.hasCrew));
         });
         boatClasses[bc.category] = classes;
       });
       dbname = query.race;
       initialize();
-    }).catch(function(error) {
+    }).catch(function (error) {
       logError('Bad response from server: ' + error);
       throw new FatalError('Other Error ' + error);
     });
 }
 
-function initialize() {
+function initialize () {
   document.title = raceName + ' Race Configuration';
   $('#race-name').val(raceName);
   $('#race-date').val(raceDate);
@@ -58,14 +58,14 @@ function initialize() {
 
   var template = $('#age-category-template').clone(false).removeClass('d-none').addClass('d-flex').removeAttr('id');
   var insertionPoint = $('#age-category-insertion');
-  ageCategories.forEach(function(item) {
+  ageCategories.forEach(function (item) {
     cloneTemplate(template, insertionPoint, item);
   });
 
   template = $('#gender-category-template').clone(false).removeClass('d-none').addClass('d-flex').removeAttr('id');
   insertionPoint = $('#gender-category-insertion');
 
-  genderCategories.forEach(function(item) {
+  genderCategories.forEach(function (item) {
     cloneTemplate(template, insertionPoint, item);
   });
 
@@ -80,7 +80,7 @@ function initialize() {
 
     outerClone.children('[name="bcat-inner"]').html(category);
     var innerInsertion = outerClone.find('[name="bclass-insertion"]');
-    classes.forEach(function(item) {
+    classes.forEach(function (item) {
       var innerClone = innerTemplate.clone(false);
       innerClone.data('type', 'boat-class').data('category', category).data('has-crew', item.hasCrew).data('class', item.name);
       innerClone.children('[name="bclass-inner"]').html(item.name).data('category', category).data('has-crew', item.hasCrew).data('name', item.name);
@@ -90,19 +90,19 @@ function initialize() {
   }
 }
 
-function cloneTemplate(template, insertionPoint, item) {
+function cloneTemplate (template, insertionPoint, item) {
   var clone = template.clone(true).removeClass('d-none').addClass('d-flex').removeAttr('id');
   clone.data('category', item);
   clone.children('[name$="-inner"]').html(htmlEscape(item));
   insertionPoint.before(clone);
 }
 
-$('ul').on('click', 'div[name="age-deletion"], div[name="gender-deletion"], div[name="bclass-deletion"], div[name="bcat-deletion"]', function() {
+$('ul').on('click', 'div[name="age-deletion"], div[name="gender-deletion"], div[name="bclass-deletion"], div[name="bcat-deletion"]', function () {
   var li = $(this).parent();
   li.remove();
 });
 
-$('#age-category-insertion, #gender-category-insertion, li[name="bcat-insertion"]').on('click', function() {
+$('#age-category-insertion, #gender-category-insertion, li[name="bcat-insertion"]').on('click', function () {
   var li = $(this);
   var title = li.data('title');
   $('#new-thing-title').html('New ' + title + ' Category');
@@ -112,7 +112,7 @@ $('#age-category-insertion, #gender-category-insertion, li[name="bcat-insertion"
   $('#new-thing').data('type', 'id').data('target', this).data('target-id', li.attr('id')).modal('show');
 });
 
-$('ul').on('click', 'li[name="bclass-insertion"]', function() {
+$('ul').on('click', 'li[name="bclass-insertion"]', function () {
   var li = $(this);
   var title = li.parents('li').data('category');
   $('#new-class-title').html('New ' + title + ' Class');
@@ -123,10 +123,10 @@ $('ul').on('click', 'li[name="bclass-insertion"]', function() {
   $('#new-class').data('type', 'target').data('target', this).data('target-id', li.attr('id')).modal('show');
 });
 
-$('#new-thing, #new-class').on('keyup blur', 'input:visible', function() {
+$('#new-thing, #new-class').on('keyup blur', 'input:visible', function () {
   var disableIt = false;
   var parent = $(this).parents('.modal-content');
-  parent.find('input:visible').each(function() {
+  parent.find('input:visible').each(function () {
     if ($(this).val() === '') {
       disableIt = true;
     }
@@ -134,7 +134,7 @@ $('#new-thing, #new-class').on('keyup blur', 'input:visible', function() {
   parent.find('button.btn-primary').attr('disabled', disableIt);
 });
 
-$('#new-class-save').on('click', function() {
+$('#new-class-save').on('click', function () {
   $('#new-class').modal('hide');
   var $target;
   if ($('#new-class').data('type') === 'id') {
@@ -149,7 +149,7 @@ $('#new-class-save').on('click', function() {
   $target.before($innerClone);
 });
 
-$('#new-thing-save').on('click', function() {
+$('#new-thing-save').on('click', function () {
   $('#new-thing').modal('hide');
   var $target;
   if ($('#new-thing').data('type') === 'id') {
@@ -162,12 +162,12 @@ $('#new-thing-save').on('click', function() {
   cloneTemplate($template, $target, name);
 });
 
-$('#resetConfig').on('click', function() {
+$('#resetConfig').on('click', function () {
   $('li.list-group-item.d-flex:visible:not([id$=insertion])').remove();
   initialize();
 });
 
-$('#saveConfig').on('click', function() {
+$('#saveConfig').on('click', function () {
   var config = {
     race_director: $('#race-director').val(),
     race_name: $('#race-name').val(),
@@ -180,29 +180,29 @@ $('#saveConfig').on('click', function() {
     config._id = slugify(config.race_name + config.race_date);
   }
   var ages = [];
-  $('#age-category li:visible:not("#age-category-insertion")').each(function() {
+  $('#age-category li:visible:not("#age-category-insertion")').each(function () {
     ages.push($(this).data('category'));
   });
   config.age_categories = ages;
 
   var genders = [];
-  $('#gender-category li:visible:not("#gender-category-insertion")').each(function() {
+  $('#gender-category li:visible:not("#gender-category-insertion")').each(function () {
     genders.push($(this).data('category'));
   });
   config.gender_categories = genders;
 
   var boatCategories = [];
-  $('#boat-category > li:visible:not([id=bcat-insertion])').each(function() {
+  $('#boat-category > li:visible:not([id=bcat-insertion])').each(function () {
     var boatClasses = [];
-    $(this).find('ul > li:visible:not([name="bclass-insertion"])').each(function() {
+    $(this).find('ul > li:visible:not([name="bclass-insertion"])').each(function () {
       boatClasses.push({
-        'Name': $(this).data('class'),
-        'hasCrew': $(this).data('hasCrew')
+        Name: $(this).data('class'),
+        hasCrew: $(this).data('hasCrew')
       });
     });
     boatCategories.push({
-      'category': $(this).data('category'),
-      'classes': boatClasses
+      category: $(this).data('category'),
+      classes: boatClasses
     });
   });
   config.boat_classes = boatCategories;
@@ -210,22 +210,22 @@ $('#saveConfig').on('click', function() {
 
   if (query.race !== 'saranac') {
     fetch(COUCHURL + CONFIG_DB + query.race, {
-        method: 'PUT',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(config)
-      })
-      .then(function(response) {
+      method: 'PUT',
+      cache: 'no-cache',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(config)
+    })
+      .then(function (response) {
         if (!response.ok) {
           logError('Bad response from server');
           throw new FatalError('Bad response');
         }
         return response;
-      }).then(function(resp) {
+      }).then(function (resp) {
         return resp.json();
-      }).catch(function(error) {
+      }).catch(function (error) {
         logError('Bad response from server: ' + error);
         throw new FatalError('Other Error ' + error);
       });
